@@ -5,6 +5,10 @@ import javax.swing.JFrame;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
 
+import datastructure.Node;
+import datastructure.SerieParallelGraph;
+import datastructure.SimpleViewer;
+
 public class Main {
 
 	public static void main(String[] args) {
