@@ -38,4 +38,11 @@ public class Node {
 		this.children.add(node);
 		node.getParents().add(this);
 	}
+	
+	public String toString() {
+		return new String(label+"= ["+x+";"+y+"]");
+	}
+	public String getLabel() {
+		return label;
+	}
 }

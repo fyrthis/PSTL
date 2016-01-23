@@ -1,38 +1,45 @@
 package datastructure;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JFrame;
 
 import com.mxgraph.model.mxCell;
-import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
 
-public class SimpleViewer extends JFrame
-
-	{
-
-		/**
-		 * 
-		 */
+public class SimpleViewer extends JFrame {
 		private static final long serialVersionUID = -2707712944901661771L;
-		mxGraph graph = new mxGraph();
-		Object gParent = graph.getDefaultParent();
-		protected List<mxCell> vertices =  new ArrayList<>();
-		private static double x=0;
-		private List<Integer> offset =  new ArrayList<>();
-		public SimpleViewer(SerieParallelGraph g)
-		{
-			super("Hello, World!");
-
-			
-
+		
+		//Pour JGraph
+		private mxGraph graph = new mxGraph();
+		private Object gParent = graph.getDefaultParent();
+		private List<mxCell> vertices =  new ArrayList<>();
+		
+		//Pour les algos
+		private int[] nextPlaceFree = new int[50];
+		private int depthMax=0;
+		private SerieParallelGraph g;
+		private int pas = 5;
+		public SimpleViewer(SerieParallelGraph g) {
+			super("Graphe Serie-Parallel");
+			this.g=g;
 			graph.getModel().beginUpdate();
 			try
 			{
-				//draw(g.getSource(), null);
-				drawEssai(g.getSource(), 0);
+				//Trouver la profondeur
+				findDepthMax(g.getSource(), 0);
+				g.getSink().y=depthMax*pas;
+				System.out.println(depthMax);
+				//Placer les pères et les ordonnées
+				computeDown(g.getSource(), 0);
+				System.out.println("Fin algo aller");
+				//Placer les fils
+				computeUp(g.getSink(), depthMax);
+				System.out.println("Fin algo retour");
+				//Puis dessiner
+				draw(g.getSource(), null);
 			}
 			finally
 			{
@@ -47,8 +54,25 @@ public class SimpleViewer extends JFrame
 			setVisible(true);
 		}
 		
+		/**
+		 * En fonction des coordonnées des noeuds, on va dessiner le graphe
+		 * à l'aide de JGraph, en prenant soin de ne pas dessiner plusieurs
+		 * fois les noeuds.
+		 * @param n : noeud source du graphe.
+		 * @param parent : initialisé à null.
+		 */
 		private void draw(Node n, Object parent) {
-			Object node = graph.insertVertex(gParent, null, n.label, n.x*20, n.y*20, 20, 20);
+			Object node = null;
+			for(mxCell cell : vertices) { //On regarde si on a déjà dessiné un noeud ici, pour pas le dessiner 50 fois.
+				if(cell.getGeometry().getX() == n.x*4*pas && cell.getGeometry().getY() == n.y*4*pas) {
+					node = cell;
+				}
+			}
+			if(node==null) {
+				node = graph.insertVertex(gParent, null, n.label, n.x*4*pas, n.y*4*pas, 20, 20);
+				vertices.add((mxCell) node);
+			}
+			
 			if(parent!=null)
 				graph.insertEdge(parent, null, null, parent, node);
 
@@ -56,67 +80,70 @@ public class SimpleViewer extends JFrame
 				for(Node child : n.getChildren())
 					draw(child, node);
 		}
-		
-		private com.mxgraph.model.mxICell drawEssai(Node n, int depth) {
-			ArrayList<Node> children = n.getChildren();
-			if(children.isEmpty()) { x+=70; }
-			double box = 20.0;
-			ArrayList<Node> before = new ArrayList<>();
-			for(int i=0; i<children.size()%2; i++) {
-				before.add(children.get(i));
-			}
-			ArrayList<Node> after = new ArrayList<>();
-			for(int i=children.size()%2; i<children.size(); i++) {
-				after.add(children.get(i));
-			}
-			double y = 70.0*depth;
-			
-			ArrayList<Object> Obefore = new ArrayList<>();
-			for(Node b : before) {
-				Obefore.add(drawEssai(b, depth+1));
-			}
-			
-			mxCell v=null;
-			//Si le noeud existe déjà
-			for(mxCell c : vertices) {
-				System.out.println(c.getValue()+"   "+n.label);
-				if(c.getValue().equals(n.label)) {
-					v = c;
-				}
-			}
-			if(v==null) {
-				v = (mxCell) graph.insertVertex(gParent, null, n.label ,x,  y, box, box); //Construction d'un noeud
-				vertices.add(v);
-			}
-			
-			
-			ArrayList<Object> Oafter = new ArrayList<>();
-			for(Node b : after) {
-				Oafter.add(drawEssai(b, depth+1));
-			}
-			for(Object b : Obefore) {
-				graph.insertEdge(gParent, null, null, v, b);
-			}
-			for(Object b : Oafter) {
-				graph.insertEdge(gParent, null, null, v, b);
-			}
-
-			return v;
-		}
-
-		private void drawEssaiAlgo(Node n, int depth) {
-			n.y = depth;
+		/**
+		 * On cherche ici à effectuer tous les chemins possibles de la source 
+		 * vers la sink, afin de déterminer le chemin le plus long, c-a-d
+		 * la profondeur.
+		 * 
+		 * @param n : noeud source du graphe
+		 * @param depth : profondeur courante
+		 */
+		private void findDepthMax(Node n, int depth) {
 			for(Node child : n.getChildren()) {
-				drawEssaiAlgo(child, depth+1);
+				findDepthMax(child, depth+1);
 			}
-			
-			if (n.getChildren().size() == 0) {
-				if(depth >= offset.size()) offset.add(0);
-				Integer placeX = offset.get(depth);
-				placeX += 1;
-				n.x = placeX;
+			if(depthMax<depth) depthMax=depth;
+		}
+
+		/**
+		 * On place les abscisses pères par rapport à leurs enfants et 
+		 * les ordonnées par rapport à leur chemin le plus court au noeud terminal.
+		 * On parcourt donc la structure de la source vers la sink :
+		 *  "algorithme à la descente"
+		 * 
+		 * @param n : Noeud source du graphe qu'on veut dessiner
+		 * @param depth : initialisé à zéro
+		 * @return profondeur courante
+		 */
+		private int computeDown(Node n, int depth) {
+			int y=depth;
+			for(Node child : n.getChildren()) {
+				y = computeDown(child, depth+1);
+				n.y = Math.max(n.y, (depthMax/y)*depth*pas);
+			}
+
+			if (n.getChildren().isEmpty()) {
+				if(depth >= nextPlaceFree.length) nextPlaceFree = Arrays.copyOf(nextPlaceFree, nextPlaceFree.length+500);
+				n.x = nextPlaceFree[depth]*pas;
+				nextPlaceFree[depth]= n.x/pas +1;
 			} else {
-				int placeX = (n.getChildren().get(0).x + n.getChildren().get(n.getChildren().size()-1).x) / 2;
+				n.x = Math.max( ((n.getChildren().get(0).x + n.getChildren().get(n.getChildren().size()-1).x) / 2), nextPlaceFree[depth]*pas);
+				nextPlaceFree[depth] = n.x/pas +1;
+			}
+			return y;
+			
+		}
+		
+		/**
+		 * On place les abscisses fils par rapport à leurs parents.
+		 * On parcourt donc la structure de la sink vers la source :
+		 *  "algorithme à la (re)montée"
+		 * 
+		 * @param n : Noeud sink du graphe qu'on veut dessiner
+		 * @param depth : initialisé à la profondeur du graphe
+		 */
+		private void computeUp(Node n, int depth) {
+			if(n==g.getSource()) return;
+			if(!n.getParents().isEmpty())
+				for(Node parent : n.getParents()) {
+					computeUp(parent, depth-1);
+				}
+			
+			if (n.getParents().isEmpty() || n.getParents().size()==1) {
+				//DO NOTHING
+			} else {
+				n.x = Math.min( ((n.getParents().get(0).x + n.getParents().get(n.getParents().size()-1).x) / 2), n.x);
 			}
 		}
+		
 	}

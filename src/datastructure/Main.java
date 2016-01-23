@@ -1,13 +1,10 @@
+package datastructure;
 import java.util.List;
 
 import javax.swing.JFrame;
 
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
-
-import datastructure.Node;
-import datastructure.SerieParallelGraph;
-import datastructure.SimpleViewer;
 
 public class Main {
 
@@ -35,14 +32,22 @@ public class Main {
 		 *              \ /
 		 *               g
 		 *****************************************/
-		Node a = new Node("a",10,0);
-		Node b = new Node("b",3,6);
-		Node c = new Node("c",0,8);
-		Node d = new Node("d",3,8);
-		Node e = new Node("e",6,8);
-		Node f = new Node("f",3,10);
-		Node g = new Node("g",10,17);
-		Node h = new Node("h",19,8);
+//		Node a = new Node("a",10,0);
+//		Node b = new Node("b",3,6);
+//		Node c = new Node("c",0,8);
+//		Node d = new Node("d",3,8);
+//		Node e = new Node("e",6,8);
+//		Node f = new Node("f",3,10);
+//		Node g = new Node("g",10,17);
+//		Node h = new Node("h",19,8);
+		Node a = new Node("a",0,0);
+		Node b = new Node("b",0,0);
+		Node c = new Node("c",0,0);
+		Node d = new Node("d",0,0);
+		Node e = new Node("e",0,0);
+		Node f = new Node("f",0,0);
+		Node g = new Node("g",0,0);
+		Node h = new Node("h",0,0);
 		
 		SerieParallelGraph graph = new SerieParallelGraph(b, c); //b-c
 		SerieParallelGraph graph2 = new SerieParallelGraph(c, f);//c-f

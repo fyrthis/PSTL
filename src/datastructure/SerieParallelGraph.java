@@ -1,4 +1,7 @@
 package datastructure;
+
+import java.util.Iterator;
+
 public class SerieParallelGraph {
 
 	private Node source;
@@ -14,14 +17,16 @@ public class SerieParallelGraph {
 		for(Node child : g.getSource().getChildren())
 			if(!g.getSource().getChildren().contains(child))
 				this.source.getChildren().add(child);
+		
 		for(Node parent : g.getSink().getParents())
 			if(!g.getSink().getParents().contains(parent))
 				this.sink.getParents().add(parent);
 	}
 	
 	public void seriePlugIn(SerieParallelGraph g) {
-		for(Node child : g.getSource().getChildren())
-			this.sink.getParents().add(child);
+		if(g.getSource()!=this.sink)
+			for(Node child : g.getSource().getChildren())
+				this.sink.getChildren().add(child);
 		this.sink = g.getSink();
 	}
 
