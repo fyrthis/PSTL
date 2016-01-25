@@ -1,6 +1,6 @@
 package datastructure;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -18,10 +18,11 @@ public class SimpleViewer extends JFrame {
 		private List<mxCell> vertices =  new ArrayList<>();
 		
 		//Pour les algos
-		private int[] nextPlaceFree = new int[50];
-		private int depthMax=0;
+		private int[] nextFreePlace = new int[50];
+		private int[] offset;
+		private int graphDepth=0;
 		private SerieParallelGraph g;
-		private int pas = 5;
+		private int step = 5;
 		public SimpleViewer(SerieParallelGraph g) {
 			super("Graphe Serie-Parallel");
 			this.g=g;
@@ -30,13 +31,13 @@ public class SimpleViewer extends JFrame {
 			{
 				//Trouver la profondeur
 				findDepthMax(g.getSource(), 0);
-				g.getSink().y=depthMax*pas;
-				System.out.println(depthMax);
+				g.getSink().y=graphDepth*step;
+				System.out.println(graphDepth);
 				//Placer les pères et les ordonnées
 				computeDown(g.getSource(), 0);
 				System.out.println("Fin algo aller");
 				//Placer les fils
-				computeUp(g.getSink(), depthMax);
+				computeUp(g.getSink());
 				System.out.println("Fin algo retour");
 				//Puis dessiner
 				draw(g.getSource(), null);
@@ -64,12 +65,13 @@ public class SimpleViewer extends JFrame {
 		private void draw(Node n, Object parent) {
 			Object node = null;
 			for(mxCell cell : vertices) { //On regarde si on a déjà dessiné un noeud ici, pour pas le dessiner 50 fois.
-				if(cell.getGeometry().getX() == n.x*4*pas && cell.getGeometry().getY() == n.y*4*pas) {
+				if(cell.getValue()==n.label) { //On considère le label unique...
 					node = cell;
 				}
 			}
 			if(node==null) {
-				node = graph.insertVertex(gParent, null, n.label, n.x*4*pas, n.y*4*pas, 20, 20);
+				node = graph.insertVertex(gParent, null, n.label, n.x*4*step, n.y*4*step, 20, 20);
+				System.out.println(n.label+"= ["+n.x+","+n.y+"]");
 				vertices.add((mxCell) node);
 			}
 			
@@ -92,7 +94,7 @@ public class SimpleViewer extends JFrame {
 			for(Node child : n.getChildren()) {
 				findDepthMax(child, depth+1);
 			}
-			if(depthMax<depth) depthMax=depth;
+			if(graphDepth<depth) graphDepth=depth;
 		}
 
 		/**
@@ -102,25 +104,28 @@ public class SimpleViewer extends JFrame {
 		 *  "algorithme à la descente"
 		 * 
 		 * @param n : Noeud source du graphe qu'on veut dessiner
-		 * @param depth : initialisé à zéro
+		 * @param depthLevel : initialisé à zéro
 		 * @return profondeur courante
 		 */
-		private int computeDown(Node n, int depth) {
-			int y=depth;
+		private int computeDown(Node n, int depthLevel) {
+			int lengthOfPath=depthLevel;
+
 			for(Node child : n.getChildren()) {
-				y = computeDown(child, depth+1);
-				n.y = Math.max(n.y, (depthMax/y)*depth*pas);
+				lengthOfPath = computeDown(child, depthLevel+1);
+				n.y = Math.max(n.y, (graphDepth/lengthOfPath)*depthLevel*step);
+			}
+			
+
+			if (n.getChildren().isEmpty() || n.getChildren().size()==1) {
+				n.x = nextFreePlace[n.y/step]*step;
+				nextFreePlace[n.y/step]++;
+				
+			} else {
+				n.x = Math.max(((n.getChildren().get(0).x + n.getChildren().get(n.getChildren().size()-1).x) / 2), nextFreePlace[n.y/step]*step);
+				nextFreePlace[n.y/step]++;
 			}
 
-			if (n.getChildren().isEmpty()) {
-				if(depth >= nextPlaceFree.length) nextPlaceFree = Arrays.copyOf(nextPlaceFree, nextPlaceFree.length+500);
-				n.x = nextPlaceFree[depth]*pas;
-				nextPlaceFree[depth]= n.x/pas +1;
-			} else {
-				n.x = Math.max( ((n.getChildren().get(0).x + n.getChildren().get(n.getChildren().size()-1).x) / 2), nextPlaceFree[depth]*pas);
-				nextPlaceFree[depth] = n.x/pas +1;
-			}
-			return y;
+			return lengthOfPath;
 			
 		}
 		
@@ -132,18 +137,30 @@ public class SimpleViewer extends JFrame {
 		 * @param n : Noeud sink du graphe qu'on veut dessiner
 		 * @param depth : initialisé à la profondeur du graphe
 		 */
-		private void computeUp(Node n, int depth) {
-			if(n==g.getSource()) return;
+		private void computeUp(Node n) {
+			System.out.println(n.label);
+			if(n==g.getSource()) { System.out.println("on retourne car "+n.label+"=="+g.getSource().label);return;}
 			if(!n.getParents().isEmpty())
 				for(Node parent : n.getParents()) {
-					computeUp(parent, depth-1);
+					computeUp(parent);
+					System.out.println(n.label+" a pour parent "+parent.label+"("+n.getParents().size()+"parents)");
 				}
-			
-			if (n.getParents().isEmpty() || n.getParents().size()==1) {
+			else System.out.println(n.label+" est orphelin..");
+
+			if (n.getParents().isEmpty() || (n.getParents().size()==1) ) {
 				//DO NOTHING
 			} else {
-				n.x = Math.min( ((n.getParents().get(0).x + n.getParents().get(n.getParents().size()-1).x) / 2), n.x);
+				int newXMaybe = ((n.getParents().get(0).x + n.getParents().get(n.getParents().size()-1).x) / 2);
+				if(newXMaybe < n.x) {
+					HashSet<Node> descendants = n.getDescendants();
+					for(Node e : descendants) {
+						e.x += (newXMaybe - n.x);
+					}
+					n.x = newXMaybe;
+				}
+				
 			}
+			
 		}
 		
 	}

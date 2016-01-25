@@ -1,12 +1,23 @@
 package datastructure;
-import java.util.List;
-
-import javax.swing.JFrame;
-
-import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.view.mxGraph;
 
 public class Main {
+	
+	static Node a = new Node("a");
+	static Node b = new Node("b");
+	static Node c = new Node("c");
+	static Node d = new Node("d");
+	static Node e = new Node("e");
+	static Node f = new Node("f");
+	static Node g = new Node("g");
+	static Node h = new Node("h");
+	static Node i = new Node("i");
+	static Node j = new Node("j");
+	static Node k = new Node("k");
+	static Node l = new Node("l");
+	static Node m = new Node("m");
+	static Node n = new Node("n");
+	static Node o = new Node("o");
+	static Node p = new Node("p");
 
 	public static void main(String[] args) {
 		/****************************************
@@ -32,46 +43,44 @@ public class Main {
 		 *              \ /
 		 *               g
 		 *****************************************/
-//		Node a = new Node("a",10,0);
-//		Node b = new Node("b",3,6);
-//		Node c = new Node("c",0,8);
-//		Node d = new Node("d",3,8);
-//		Node e = new Node("e",6,8);
-//		Node f = new Node("f",3,10);
-//		Node g = new Node("g",10,17);
-//		Node h = new Node("h",19,8);
-		Node a = new Node("a",0,0);
-		Node b = new Node("b",0,0);
-		Node c = new Node("c",0,0);
-		Node d = new Node("d",0,0);
-		Node e = new Node("e",0,0);
-		Node f = new Node("f",0,0);
-		Node g = new Node("g",0,0);
-		Node h = new Node("h",0,0);
 		
-		SerieParallelGraph graph = new SerieParallelGraph(b, c); //b-c
-		SerieParallelGraph graph2 = new SerieParallelGraph(c, f);//c-f
-		graph.seriePlugIn(graph2);								 //b-c-f
-		graph2 = new SerieParallelGraph(b, d);                   //b-d
-		SerieParallelGraph graph3 = new SerieParallelGraph(d, f);//d-f
-		graph2.seriePlugIn(graph3); 							 //b-d-f
-		graph.parallelPlugIn(graph2); 							 //b-cd-f
-		graph2 = new SerieParallelGraph(b, e);					 //b-e
-		graph3 = new SerieParallelGraph(e, f);					 //e-f
-		graph2.seriePlugIn(graph3);								 //b-e-f
-		graph.parallelPlugIn(graph2); 							 //b-cde-f
-		graph2 = new SerieParallelGraph(f, g);                   //f-g
-		graph.seriePlugIn(graph2); 								 //b-cde-f-g
-		graph2 = new SerieParallelGraph(a, b);                   //a-b
-		graph2.seriePlugIn(graph);
-		graph = graph2;											 //a-b-cde-f-g
-		graph2 = new SerieParallelGraph(a, h);                   //a-h
-		graph3 = new SerieParallelGraph(h, g);                   //h-g
-		graph2.seriePlugIn(graph3);                              //a-h-g
-		graph.parallelPlugIn(graph2);                            //FINI
+		SerieParallelGraph graph;
+		SerieParallelGraph tmp = GraphController.newSerieGraph("b", "c", "g");
+		graph = tmp;
+		tmp = GraphController.newSerieGraph("b", "d", "g");
+		graph.parallelPlugIn(tmp);
+		tmp = GraphController.newSerieGraph("b", "e", "g");
+		graph.parallelPlugIn(tmp);
+		tmp = GraphController.newSerieGraph("a", "b");
+		tmp.seriePlugIn(graph);
+		graph = tmp;
+		tmp = GraphController.newSerieGraph("g", "h");
+		graph.seriePlugIn(tmp);
+		tmp = GraphController.newSerieGraph("a", "f", "h");
+		graph.parallelPlugIn(tmp);
 		
+		SerieParallelGraph graph2;
+		tmp = GraphController.newSerieGraph("i", "j", "n");
+		graph2 = tmp;
+		graph2.parallelPlugIn(tmp);
+		tmp = GraphController.newSerieGraph("i", "k", "n");
+		graph2.parallelPlugIn(tmp);
+		tmp = GraphController.newSerieGraph("i", "l", "n");
+		graph2.parallelPlugIn(tmp);
+		tmp = GraphController.newSerieGraph("h", "i");
+		tmp.seriePlugIn(graph2);
+		graph2 = tmp;
+		tmp = GraphController.newSerieGraph("n", "o");
+		graph2.seriePlugIn(tmp);
+		tmp = GraphController.newSerieGraph("h", "m", "o");
+		graph2.parallelPlugIn(tmp);
+		graph.seriePlugIn(graph2);
+
+		
+		System.out.println("le graphe a pour source/sink : ["+graph.getSource().label+","+graph.getSink().label+"]");
 		new SimpleViewer(graph);
 		
+		
+		
 	}
-
 }

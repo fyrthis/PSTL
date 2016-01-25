@@ -1,16 +1,22 @@
 package datastructure;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Node {
+public class Node implements Cloneable {
 	public int x;
 	public int y;
-	public int depth; //i.e. nb d'ancetres jusqu'à la racine + 1
-	public int nbDesc; //i.e. nb de descendants jusqu'au puit
-	//En connaissant ça, on peut avoir son ordonnée.
 	ArrayList<Node> parents;
 	ArrayList<Node> children;
 	public String label;
 	
+	public Node(String label) {
+		this.label = label;
+		x=0;
+		y=0;
+		parents = new ArrayList<Node>();
+		children = new ArrayList<Node>();
+	}
 	public Node(int x, int y){
 		this.x = x;
 		this.y = y;
@@ -44,5 +50,21 @@ public class Node {
 	}
 	public String getLabel() {
 		return label;
+	}
+	@Override
+	public Node clone() throws CloneNotSupportedException {
+		//Copie profonde très difficile, on risque de dupliquer 
+		//  les fils et les pères...
+		return (Node) super.clone();
+		
+		
+	}
+	public HashSet<Node> getDescendants() {
+		HashSet<Node> descendants =  new HashSet<>();
+		for(Node child : children) {
+			descendants.add(child);
+			descendants.addAll(child.getDescendants());
+		}
+		return descendants;
 	}
 }
