@@ -1,17 +1,20 @@
-package datastructure;
+package controler;
 
-public class GraphController {
+import datastructure.GraphNode;
+import datastructure.graph.SerieParallelGraph;
+
+public class GraphControler {
 	
 	//Make Serie Graph parallel
 	public static SerieParallelGraph newSerieGraph(String a, String b, String... c) {
-		Node source = new Node(a);
-		Node sink = new Node(b);
+		GraphNode source = new GraphNode(a);
+		GraphNode sink = new GraphNode(b);
 		SerieParallelGraph g = new SerieParallelGraph(source, sink);
 		
 		if(c.length>0)
 			for(String label : c) {
-				Node r = g.getSink();
-				Node k = new Node(label);
+				GraphNode r = g.getSink();
+				GraphNode k = new GraphNode(label);
 				g.seriePlugIn(new SerieParallelGraph(r, k));
 			}
 		

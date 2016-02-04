@@ -1,18 +1,20 @@
-package datastructure;
+package datastructure.graph;
+
+import datastructure.GraphNode;
 
 public class SerieParallelGraph {
 
-	private Node source;
-	private Node sink;
+	private GraphNode source;
+	private GraphNode sink;
 	
-	public SerieParallelGraph(Node a, Node b) {
+	public SerieParallelGraph(GraphNode a, GraphNode b) {
 		source = a;
 		sink = b;
 		a.connect(b);
 	}
 	
 	public void parallelPlugIn(SerieParallelGraph g) {
-		for(Node child : g.getSource().getChildren()) {
+		for(GraphNode child : g.getSource().getChildren()) {
 			if(!this.getSource().getChildren().contains(child))
 				this.source.getChildren().add(child);
 			if(child.getParents().size() != 1) System.out.println("grave erreur");
@@ -20,7 +22,7 @@ public class SerieParallelGraph {
 			child.getParents().add(this.source);
 		}
 		
-		for(Node parent : g.getSink().getParents()) {
+		for(GraphNode parent : g.getSink().getParents()) {
 			if(!this.getSink().getParents().contains(parent))
 				this.sink.getParents().add(parent);
 			if(parent.getChildren().size() != 1) System.out.println("grave erreur");
@@ -31,7 +33,7 @@ public class SerieParallelGraph {
 	
 	public void seriePlugIn(SerieParallelGraph g) {
 		
-			for(Node child : g.getSource().getChildren()) {
+			for(GraphNode child : g.getSource().getChildren()) {
 				if(!this.sink.getChildren().contains(child))
 					this.sink.getChildren().add(child);
 				child.getParents().remove(0);
@@ -40,11 +42,11 @@ public class SerieParallelGraph {
 		this.sink = g.getSink();
 	}
 
-	public Node getSink() {
+	public GraphNode getSink() {
 		return sink;
 	}
 
-	public Node getSource() {
+	public GraphNode getSource() {
 		return source;
 	}
 }
