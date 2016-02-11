@@ -1,89 +1,64 @@
 package datastructure.spg;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import datastructure.GraphNode;
 
 public class SPG {
-	List<GraphNode> sources;
-	List<GraphNode> sinks;
+	ArrayList<SPGraph> componnentsInGraph;
 	
-	public SPG() {
-		sources = new ArrayList<>();
-		sinks = new ArrayList<>();
-	}
-	
-	public SPG(GraphNode g) {
-		sources = new ArrayList<>();
-		sinks = new ArrayList<>();
-		sources.add(g);
-		sinks.add(g);
-	}
-	
-	public SPG(List<GraphNode> sources, List<GraphNode> sinks) throws Exception {
-		sources = new ArrayList<>(sources);
-		sinks = new ArrayList<>(sinks);
-		if(!this.isSPG()) {
-			throw new Exception("Error : was not spg");
-		}
+	public SPG(ArrayList<SPGraph> graphs){
+		this.componnentsInGraph = graphs;
 	}
 
-	public void seriePlugIn(SPG spg2) {
-		GraphNode e = new GraphNode("plugIn");
-		for(GraphNode sink : sinks) {
-			sink.connect(e);
-		}
-		for(GraphNode source : spg2.getSources()) {
-			e.connect(source);
-		}
-		if(this.isEmpty()) {
-			sources.add(e);
-		}
-		if(spg2.isEmpty()) {
-			sinks.add(e);
-		} else {
-			sinks = new ArrayList<>(spg2.getSinks());
-		}
+	public ArrayList<SPGraph> getComponnentsInGraph() {
+		return componnentsInGraph;
 	}
 	
+	/**
+	 * parallel plugin with one component SPGraph
+	 * @param SPGraph spGraph2
+	 */
+	public void parallelPlugIn(SPGraph spGraph2) {
+		if(spGraph2.isEmpty()) {
+			return;
+		}
+		this.componnentsInGraph.add(spGraph2);
+	}
+	/**
+	 * parallel plugin with another SPG with a list of SPGraph that are added to the
+	 * actual structure
+	 * @param SPG spg2
+	 */
 	public void parallelPlugIn(SPG spg2) {
 		if(spg2.isEmpty()) {
 			return;
 		}
-		for(GraphNode source : spg2.getSources()) {
-			sources.add(source);
-		}
-		for(GraphNode sink : spg2.getSinks()) {
-			sinks.add(sink);
+		for(SPGraph spgraph: spg2.getComponnentsInGraph()){
+			this.componnentsInGraph.add(spgraph);
 		}
 	}
-
-	public List<GraphNode> getSources() {
-		return sources;
-	}
-
-	public void setSources(List<GraphNode> sources) {
-		this.sources = sources;
-	}
-
-	public List<GraphNode> getSinks() {
-		return sinks;
-	}
-
-	public void setSinks(List<GraphNode> sinks) {
-		this.sinks = sinks;
-	}
-	
+	/**
+	 * when componnentsInGraph is empty return true, 
+	 * check every SPGraph if empty
+	 * @return
+	 */
 	public boolean isEmpty() {
-		if(sources.isEmpty() && sinks.isEmpty()) {
+		int empty= 0;
+		if(this.componnentsInGraph.isEmpty()) {
 			return true;
 		}
-		return false;
+		for(SPGraph spg: componnentsInGraph){
+			if(!spg.isEmpty()){
+				empty++;
+			}
+		}
+		if(empty>0){
+			return false;
+		}
+		return true;
 	}
 	
-	public boolean isSPG() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	
+	
 }
