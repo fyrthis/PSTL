@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class Graph implements Iterable<Graph> {
+
 	public Graph next;
 	List<Node<?>> sources;
 	List<Node<?>> sinks;
@@ -22,6 +23,30 @@ public class Graph implements Iterable<Graph> {
 		next = null;
 		this.sources = sources;
 		this.sinks=sinks;
+	}
+	
+	public Graph getNext() {
+		return next;
+	}
+
+	public void setNext(Graph next) {
+		this.next = next;
+	}
+
+	public List<Node<?>> getSources() {
+		return sources;
+	}
+
+	public void setSources(List<Node<?>> sources) {
+		this.sources = sources;
+	}
+
+	public List<Node<?>> getSinks() {
+		return sinks;
+	}
+
+	public void setSinks(List<Node<?>> sinks) {
+		this.sinks = sinks;
 	}
 
 	public void parallelPlugIn(Graph... graphs) {
@@ -102,6 +127,8 @@ public class Graph implements Iterable<Graph> {
 		public void remove() {
 			throw new UnsupportedOperationException();
 		}
+		
+		
 	}
 
 }

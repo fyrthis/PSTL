@@ -8,6 +8,8 @@ import java.util.HashMap;
 import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.Parser;
 
+import serieparallel.SPGCreator;
+
 public class DotParser {
 	Parser parser;
 	public DotParser(String fileName) throws FileNotFoundException, ParseException {
@@ -57,6 +59,7 @@ public class DotParser {
 			//On crée alors notre graph et on le compose en parallèle au graph final
 			serieparallel.Graph interGraph = new serieparallel.Graph(listOfSources, listOfSinks);
 			//TODO : test si interGraph est connexe, sinon faire autant de sous-graphes que nécessaire.
+			
 			//TODO : pour chaque graph obtenu, faire un test de cycle
 			//Si on trouve un cycle : exception
 			//Sinon :

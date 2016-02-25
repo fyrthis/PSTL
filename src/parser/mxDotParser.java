@@ -8,6 +8,7 @@ import java.util.HashMap;
 import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.Parser;
 
+import serieparallel.SPGCreator;
 import viewer.stepbystep.mxGraph;
 import viewer.stepbystep.mxNode;
 
@@ -37,13 +38,13 @@ public class mxDotParser {
 			ArrayList<com.alexmerz.graphviz.objects.Node> nodes = graph.getNodes(false); //Pas de sous-graphe considéré.
 			ArrayList<com.alexmerz.graphviz.objects.Edge> edges = graph.getEdges();
 			//On transforme chaque noeud obtenu en Node et on le met dans une hashmap (id, value)
-			System.out.println("number of nodes : "+nodes.size());
-			System.out.println("number of edges : "+edges.size());
+			//System.out.println("number of nodes : "+nodes.size());
+			//System.out.println("number of edges : "+edges.size());
 			for(com.alexmerz.graphviz.objects.Node node : nodes) {
 				String label = node.getId().getId();
 				mxNode n = new mxNode(label);
 				mapOfNodes.put((String)n.getValue(), n);
-				System.out.println("added node "+n.getValue());
+				//System.out.println("added node "+n.getValue());
 			}
 			//On relie nos Node selon les arcs obtenus avec le parser
 			for(com.alexmerz.graphviz.objects.Edge edge : edges) {
@@ -55,7 +56,7 @@ public class mxDotParser {
 				mxNode destN = mapOfNodes.get(dest);
 				if(destN==null)System.out.println("dest is null");
 				srcN.connect(destN);
-				System.out.println("created edge between "+srcN.getValue()+" and "+destN.getValue());
+				//System.out.println("created edge between "+srcN.getValue()+" and "+destN.getValue());
 			}
 			//On détermine alors les sources et les sinks de notre Graph
 			@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -65,15 +66,19 @@ public class mxDotParser {
 			for(mxNode node : listOfNodes) {
 				if(node.getParents().isEmpty()) {
 					listOfSources.add(node);
-					System.out.println(node.getValue()+" is a source.");
+					//System.out.println(node.getValue()+" is a source.");
 				}
 				if(node.getChildren().isEmpty()) {
 					listOfSinks.add(node);
-					System.out.println(node.getValue()+" is a sink.");
+					//System.out.println(node.getValue()+" is a sink.");
 				}
 			}
 			//On crée alors notre graph et on le compose en parallèle au graph final
 			mxGraph interGraph = new mxGraph(listOfSources, listOfSinks);
+			if(SPGCreator.cycleDetection(listOfSources)){
+				System.out.println("There is a cycle in the graph");
+				//throw new Error();
+			};
 			finalGraph.parallelPlugIn(interGraph);
 		}
 		System.out.println("mxGRAPH TRANSFORMATION ENDED");

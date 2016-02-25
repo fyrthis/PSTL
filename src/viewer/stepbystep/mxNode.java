@@ -11,11 +11,13 @@ public class mxNode extends mxCell {
 	public Node n;
 	private ArrayList<mxNode> children = new ArrayList<mxNode>();
 	private ArrayList<mxNode> parents = new ArrayList<mxNode>();
+	int detectionCycle;// for cycle detection in SPGCreator
 	
 	public mxNode(Node n)
 	{
 		super(n.value, null, null);
 		this.n = n;
+		this.detectionCycle=0;// 0 by default
 		setVisible(false);
 	}
 	
@@ -70,5 +72,11 @@ public class mxNode extends mxCell {
 	}
 	public Object getValue() {
 		return n.value;
+	}
+	public int getDetectionCycle(){
+		return this.detectionCycle;
+	}
+	public void setDetectionCycle(int i){
+		this.detectionCycle = i;
 	}
 }
