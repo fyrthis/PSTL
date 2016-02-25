@@ -1,0 +1,25 @@
+digraph G {
+	n1 -> n0	 [_graphml_id=e0];
+	n1 -> n2	 [_graphml_id=e1];
+	n1 -> n3	 [_graphml_id=e6];
+	n1 -> n4	 [_graphml_id=e9];
+	n2 -> n0	 [_graphml_id=e5];
+	n3 -> n0	 [_graphml_id=e8];
+	n3 -> n2	 [_graphml_id=e2];
+	n4 -> n0	 [_graphml_id=e4];
+	n4 -> n2	 [_graphml_id=e7];
+	n4 -> n3	 [_graphml_id=e3];
+	n4 -> n5	 [_graphml_id=e10];
+	n4 -> n8	 [_graphml_id=e14];
+	n4 -> n10	 [_graphml_id=e18];
+	n5 -> n6	 [_graphml_id=e11];
+	n5 -> n11	 [_graphml_id=e20];
+	n6 -> n7	 [_graphml_id=e12];
+	n7 -> n0	 [_graphml_id=e13];
+	n8 -> n9	 [_graphml_id=e15];
+	n9 -> n5	 [_graphml_id=e16];
+	n10 -> n6	 [_graphml_id=e19];
+	n10 -> n7	 [_graphml_id=e17];
+	n11 -> n12	 [_graphml_id=e21];
+	n12 -> n2	 [_graphml_id=e22];
+}

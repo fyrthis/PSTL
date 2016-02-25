@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.util.stream.Stream;
 
 import javax.swing.AbstractButton;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;

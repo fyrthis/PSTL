@@ -1,0 +1,107 @@
+package serieparallel;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+public class Graph implements Iterable<Graph> {
+	public Graph next;
+	List<Node<?>> sources;
+	List<Node<?>> sinks;
+	
+	public Graph() {
+		//Create an empty graph
+		next=null;
+		sources = new ArrayList<>();
+		sinks = new ArrayList<>();
+	}
+	
+	public Graph(List<Node<?>> sources, List<Node<?>> sinks) {
+		next = null;
+		this.sources = sources;
+		this.sinks=sinks;
+	}
+
+	public void parallelPlugIn(Graph... graphs) {
+		if(graphs==null) return;
+		Iterator<Graph> ite = iterator();
+		Graph queue = this;
+		while(ite.hasNext()) 
+			 queue = ite.next();
+		for(Graph g : graphs) {
+			queue.next = g;
+			queue = queue.next;
+		} 
+	}
+	//TODO : Un graphe vide, ou composé d'un seul noeud, peut-il causer problème ? We must think about it :)
+	public void seriePlugIn(Graph graph) {
+		//CONNECT THIS AND GRAPH WITH AN INTERMEDIATE NODE
+		//Get all sinks of this
+		Iterator<Graph> ite = iterator();
+		HashSet<Node<?>> sinkSet = new HashSet<>(this.sinks);
+		while(ite.hasNext()) 
+			 sinkSet.addAll(ite.next().sinks);
+		//Get all sources of graph
+		ite = graph.iterator();
+		HashSet<Node<?>> sourceSet = new HashSet<>(graph.sources);
+		while(ite.hasNext()) 
+			sourceSet.addAll(ite.next().sources);
+		//New inter-node between this.sinks and graph.sources
+		Node<String> inter = new Node<String>("inter", null);
+		for(Node<?> e : sinkSet)
+			e.connect(inter);
+		for(Node<?> e : sourceSet)
+			inter.connect(e);
+		
+		//UPDATE SOURCES, SINKS AND NEXT OF THIS
+		//Get all next sources of this and add them to this.sources
+		ite = iterator();
+		HashSet<Node<?>> set = new HashSet<>();
+		while(ite.hasNext()) 
+			set.addAll(ite.next().sources);
+		sources.addAll(set);
+		//Remove this.sinks, get all sinks of graph and add them to this.sinks
+		ite = graph.iterator();
+		set = new HashSet<>();
+		while(ite.hasNext()) 
+			set.addAll(ite.next().sinks);
+		this.sinks.clear();
+		this.sinks.addAll(set);
+		
+		//SET NEXT TO NULL
+		this.next=null;
+	}
+
+	@Override
+	public Iterator<Graph> iterator() {
+		return new GraphIterator();
+	}
+
+	private class GraphIterator implements Iterator<Graph> {
+		private Graph cursor;
+
+		public GraphIterator() {
+			this.cursor = Graph.this;
+		}
+
+		public boolean hasNext() {
+			return Graph.this.next != null;
+		}
+
+		public Graph next() {
+			if(this.hasNext()) {
+				Graph current = cursor;
+				cursor = Graph.this.next;
+				return current;
+			}
+			throw new NoSuchElementException();
+		}
+
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+	}
+
+}

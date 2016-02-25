@@ -5,37 +5,37 @@ import java.util.ArrayList;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 
-import datastructure.GraphNode;
+import serieparallel.Node;
 
 public class mxNode extends mxCell {
-	public GraphNode n;
+	public Node n;
 	private ArrayList<mxNode> children = new ArrayList<mxNode>();
 	private ArrayList<mxNode> parents = new ArrayList<mxNode>();
 	
-	public mxNode(GraphNode n)
+	public mxNode(Node n)
 	{
-		super(n.label, null, null);
+		super(n.value, null, null);
 		this.n = n;
 		setVisible(false);
 	}
 	
-	public mxNode(GraphNode n, Object value)
+	public mxNode(Node n, Object value)
 	{
 		super(value, null, null);
 		this.n = n;
 		setVisible(false);
 	}
 
-	public mxNode(GraphNode n, Object value, mxGeometry geometry, String style)
+	public mxNode(Node n, Object value, mxGeometry geometry, String style)
 	{
 		super(value, geometry, style);
 		this.n = n;
 		setVisible(false);
 	}
 
-	public mxNode(String a) {
-		super(a, null, null);
-		n = new GraphNode(a);
+	public mxNode(String id) {
+		super(id, null, null);
+		n = new Node(id, id);
 		setVisible(false);
 	}
 
@@ -68,7 +68,7 @@ public class mxNode extends mxCell {
 		this.children.add(node);
 		node.getParents().add(this);
 	}
-	public String getLabel() {
-		return n.label;
+	public Object getValue() {
+		return n.value;
 	}
 }

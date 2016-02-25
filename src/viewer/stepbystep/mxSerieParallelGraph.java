@@ -1,12 +1,9 @@
 package viewer.stepbystep;
 
-import datastructure.GraphNode;
-import datastructure.graph.SerieParallelGraph;
-
 public class mxSerieParallelGraph {
 
-	private mxNode source;
-	private mxNode sink;
+	public mxNode source;
+	public mxNode sink;
 	
 	public mxSerieParallelGraph(mxNode a, mxNode b) {
 		source = a;
@@ -14,6 +11,10 @@ public class mxSerieParallelGraph {
 		a.connect(b);
 	}
 	
+	public mxSerieParallelGraph() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public void parallelPlugIn(mxSerieParallelGraph g) {
 		for(mxNode child : g.getSource().getChildren()) {
 			if(!this.getSource().getChildren().contains(child))

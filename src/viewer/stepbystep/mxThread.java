@@ -8,7 +8,7 @@ import com.mxgraph.view.mxGraph;
 
 public class mxThread extends Thread {
 
-	mxSerieParallelGraph sp;
+	viewer.stepbystep.mxGraph sp;
 	mxGraphComponent graphcp;
 	private ArrayList<mxNode> vertices;
 	private mxGraph graph = new mxGraph();
@@ -22,34 +22,34 @@ public class mxThread extends Thread {
 	private boolean myTurn = true;
 	
 	
-	public mxThread(mxSerieParallelGraph sp) {
-		this.sp=sp;
+	public mxThread(viewer.stepbystep.mxGraph mxGraph) {
+		this.sp=mxGraph;
 		//Trouver la profondeur
-		findDepthMax(sp.getSource(), 0);
+		System.out.println("mxFIND DEPTH STARTED");
+		findDepthMax(mxGraph.getSources().get(0), 0);
+		System.out.println("mxFIND DEPTH ENDED");
 		next = new int[graphDepth+1];
 		offset = new int[graphDepth+1];
-		System.out.println(graphDepth);
-		draw(sp.getSource(), null);
+		System.out.println("mxINITIALIZE GRAPHIC NODE STARTED");
+		for(mxNode node : sp.getSources())
+			draw(node, null);
+		System.out.println("mxINITIALIZE GRAPHIC NODE ENDED");
+		//draw(mxGraph.getSources().get(0), null);
 		nodeOnYaxis = new ArrayList[graphDepth+1];
 		for(int i=0;i<nodeOnYaxis.length;i++)
 			nodeOnYaxis[i] = new ArrayList<mxNode>();
 		graphcp = new mxGraphComponent(graph);
-// n		graph.getModel().beginUpdate();
-//		try
-//		{
-//			graph.insertVertex(gParent, "hello", "heloo", 10, 10, 40, 40);
-//		}
-//		finally
-//		{
-//			graph.getModel().endUpdate();
-//		}
-		
 	}
 	
 	public void run() {
 		try {
-			System.out.println("hello");
-			placeFathers(sp.getSource(), 0);
+			for(mxNode node : sp.getSources()) {
+				System.out.println("mxPLACE FATHERS STARTED");
+				placeFathers(node, 0);
+				System.out.println("mxPLACE FATHERS ENDED");
+			}
+			//placeSons(sp.getSinks().get(0));
+			graph.refresh();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -66,7 +66,6 @@ public class mxThread extends Thread {
 	
 	public void draw(mxNode node, Object parent) {
 		//Vertex drawing
-		
 		graph.addCell(node);
 		node.setVertex(true);
 		node.setGeometry(new mxGeometry(node.n.x, node.n.y, 40, 40));
@@ -86,9 +85,8 @@ public class mxThread extends Thread {
 		}
 		
 		//Récurrence sur les fils
-		for(mxNode child : node.getChildren()) {
+		for(mxNode child : node.getChildren())
 			placeFathers(child, depth+1);
-		}
 		
 		//Calcul position parent par rapport fils
 		int nbChildren = node.getChildren().size(); 
@@ -96,9 +94,8 @@ public class mxThread extends Thread {
 		if (nbChildren == 0) {
 			place = next[depth];
 			node.setX(place);
-		} else {
+		} else
 			place = (node.getChildren().get(0).n.x + node.getChildren().get(nbChildren-1).n.x) / 2;
-		}
 		
 		//calcul éventuel décalage engendré. Si on l'a décalé à cause de ses fils.
 		offset[depth] = Math.max(offset[depth], next[depth]-place);
@@ -108,7 +105,8 @@ public class mxThread extends Thread {
 			node.setX(place + offset[depth]);
 		
 		myTurn=false;
-		while(stepByStep && !myTurn) { wait(); }
+		while(stepByStep && !myTurn)
+			wait();
 		node.setVisible(true);
 		graph.refresh();
 		
@@ -116,8 +114,37 @@ public class mxThread extends Thread {
 		next[depth] = node.n.x+1;
 		
 		// On mémorise le décalage à appliquer au sous-arbre lors de la deuxième passe.
-		node.n.offset = offset[depth];
+		node.n.offset = offset[depth];	
+	}
+	
+	private void placeSons(mxNode node) {
+		if(node==sp.getSources().get(0)) return;
 		
+		for(mxNode parent : node.getParents())
+			placeSons(parent);
+
+		if (node.getParents().isEmpty() || (node.getParents().size()==1) ) {
+			//DO NOTHING
+		} else {
+			int newXMaybe = ((node.getParents().get(0).n.x + node.getParents().get(node.getParents().size()-1).n.x) / 2);
+			if(newXMaybe < node.n.x) {
+				System.out.println("newXMaybe = "+newXMaybe);
+				System.out.println("n.x = "+node.n.x);
+
+				int offset = (newXMaybe - node.n.x);
+				System.out.println("décalage engendré par "+node.n.value+" : "+(node.n.y)+"   "+graphDepth);
+				for(int i = (node.n.y+1); i<graphDepth+1; i++) {
+					System.out.println("size of : "+nodeOnYaxis[i].size());
+					//Peut-être qu'en regardant l'espace qui le sépare du prochain, on pourrait savoir si on a besoin de la déplacer ou non ?
+					for(mxNode  k : nodeOnYaxis[i]) {
+						System.out.println("on décale "+k.n.value+" de "+offset);
+						k.n.x += offset;
+					}
+				}
+				node.n.x = newXMaybe;
+			}
+			
+		}
 		
 	}
 	

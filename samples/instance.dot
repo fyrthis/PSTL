@@ -1,0 +1,15 @@
+digraph G { 
+        graph [bgcolor=lightyellow2, splines=true]; 
+        edge [color=red, arrowsize=2]; 
+        node [color=yellow, style=filled, shape=polygon, sides=6, fontname="Verdana"]; 
+        A1 -> A3 [label="est parrain de", arrowtail=dot, arrowhead=open]; 
+        A3 -> A5; 
+        A3 -> A6; 
+        A2 -> A4; 
+        A1 [label="Hugo", shape=circle, color=blue, fontcolor=white]; 
+        A2 [label="Boris"]; 
+        A3 [label="Cécile"]; 
+        A4 [label="François"]; 
+        A5 [label="Frank"]; 
+        A6 [label="Elise"]; 
+} 

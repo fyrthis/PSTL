@@ -3,5 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="lib" path="/media/tanguinoche/Data/workspace/PSTL/lib/jgraphx.jar"/>
+	<classpathentry kind="lib" path="/media/tanguinoche/Data/workspace/PSTL/lib/graphviz0_8_3beta.jar"/>
+	<classpathentry kind="lib" path="/media/tanguinoche/Data/workspace/PSTL/lib/qtjambi-4.8.7.jar"/>
+	<classpathentry kind="lib" path="/media/tanguinoche/Data/workspace/PSTL/lib/qtjambi-native-linux64-gcc-4.8.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

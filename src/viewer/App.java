@@ -3,12 +3,16 @@ package viewer;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import com.alexmerz.graphviz.ParseException;
+
+import parser.mxDotParser;
 import viewer.stepbystep.GraphComponent;
-import viewer.stepbystep.mxGraphInstance;
+import viewer.stepbystep.mxGraph;
 import viewer.stepbystep.mxThread;
 
 public class App extends JFrame implements ActionListener{
@@ -27,17 +31,17 @@ public class App extends JFrame implements ActionListener{
 		tabs = new Tab();
 		add(tabs);
 		//Create Panel
-		mxThread thread = new mxThread(mxGraphInstance.one());
-		tabs.add("tab1",new GraphComponent(thread));
-		
-		//viewer = new SecondVersionViewer(GraphInstance.one());
-		
-		//viewer = new SimpleViewer(GraphInstance.one());
-		
-		//TreeControler tc= new TreeControler();
-//		Tree tree = tc.randomTree(3, 3);
-//		viewer = new TreeViewer(tree);
-		
+		mxDotParser parser;
+		try {
+			parser = new mxDotParser("samples/random-dag/g.50.8.graphml.dot");
+			mxGraph graph = parser.getGraph();
+			if(graph==null) System.out.println("graph is null");
+			mxThread thread = new mxThread(graph);
+			tabs.add("tab1",new GraphComponent(thread));
+		} catch (FileNotFoundException | ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//Create Window
 		add(tabs, BorderLayout.CENTER);
 		button = new JButton("next step");

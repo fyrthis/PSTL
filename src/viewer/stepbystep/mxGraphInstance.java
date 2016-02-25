@@ -1,8 +1,5 @@
 package viewer.stepbystep;
 
-import controler.GraphControler;
-import datastructure.graph.SerieParallelGraph;
-
 public class mxGraphInstance {
 
 	public static mxSerieParallelGraph one() {
