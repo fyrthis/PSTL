@@ -79,6 +79,7 @@ public class mxDotParser {
 				System.out.println("There is a cycle in the graph");
 				//throw new Error();
 			};
+			//finalGraph = SPGCreator.connectedComponnents(interGraph); //ne marche pas encore ;-)
 			finalGraph.parallelPlugIn(interGraph);
 		}
 		System.out.println("mxGRAPH TRANSFORMATION ENDED");

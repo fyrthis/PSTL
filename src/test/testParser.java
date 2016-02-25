@@ -31,5 +31,20 @@ public class testParser {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	public void testCycle() {
+		mxDotParser parser;
+		try {
+			parser = new mxDotParser("samples/random-dag/g.1.graphml.dot");
+			mxGraph graph = parser.getGraph();
+			if(graph==null) System.out.println("graph is null");
+		} catch( Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Error e){
+			e.printStackTrace();
+		}
+	}
 
 }
