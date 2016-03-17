@@ -5,15 +5,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class Node<T> extends Point {
+public class Node<T> extends Point.Float {
 	private static final long serialVersionUID = -324274001558021403L;
 	
 	public final String id;
 	public T value;
-	//Coordinates x,y inherited
-	public int offset;
 	private List<Node<?>> parents;
 	private List<Node<?>> children;
+	//Coordinates x,y inherited
+	public float offset;
+	public int tag = 0;
+	public int detectionCycle;
+
 	
 	/**
 	 * 
@@ -30,16 +33,19 @@ public class Node<T> extends Point {
 		children = new ArrayList<>();
 	}
 	
+
 	/**
 	 * Connect two nodes between them.
 	 * A node cannot be father twice of the same node.
 	 * @param node : node that will become child of this
 	 */
 	public void connect(Node<?> node) {
-		if(!children.contains(node))
-			this.children.add(node);
-		if(!parents.contains(node))
-			node.parents.add(this);
+//		if(!children.contains(node))
+//			this.children.add(node);
+//		if(!parents.contains(node))
+//			node.parents.add(this);
+		this.children.add(node);
+		node.getParents().add(this);
 	}
 	
 	/**
@@ -128,6 +134,15 @@ public class Node<T> extends Point {
 	}
 	public List<Node<?>> getChildren() {
 		return children;
+	}
+
+
+	public int getDetectionCycle() {
+		return detectionCycle;
+	}
+	
+	public void setDetectionCycle(int i){
+		this.detectionCycle = i;
 	}
 	
 }

@@ -2,13 +2,6 @@ package serieparallel;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
-
-
-import serieparallel.Graph;
-import serieparallel.Node;
-import viewer.stepbystep.mxGraph;
-import viewer.stepbystep.mxNode;
 
 public class SPGCreator {
 
@@ -40,26 +33,26 @@ public class SPGCreator {
 	 * 
 	 * @param nodes
 	 */
-	public static mxGraph connectedComponnents (mxGraph spg){
+	public static Graph connectedComponnents (Graph spg){
 		//create list of sources (find all nodes without parents by connected component)
-		ArrayList<mxNode> listOfSources = new ArrayList<>();
+		ArrayList<Node<?>> listOfSources = new ArrayList<>();
 		//create list of sinks (find all nodes without descendant by connected component)
-		ArrayList<mxNode> listOfSinks = new ArrayList<>();
+		ArrayList<Node<?>> listOfSinks = new ArrayList<>();
 		//DFS that separates different components and creates SPGraph for each connected component
-		mxGraph component = null;
+		Graph component = null;
 		
-		Iterator<mxNode> it = listOfSources.iterator();
+		Iterator<Node<?>> it = listOfSources.iterator();
 		while (it.hasNext()) {
-			mxNode u = it.next();
+			Node<?> u = it.next();
 			DFScomponentVisit(u,listOfSources,listOfSinks);
 			//
 			spg.getSources().removeAll(listOfSources);
 			spg.getSinks().removeAll(listOfSinks);
 
 			if(component!=null){
-				component.next = new mxGraph(listOfSources,listOfSinks);
+				component.next = new Graph(listOfSources,listOfSinks);
 			} else {
-				component = new mxGraph(listOfSources,listOfSinks);
+				component = new Graph(listOfSources,listOfSinks);
 			}
 
 			listOfSources.clear();
@@ -70,7 +63,7 @@ public class SPGCreator {
 	}
 
 
-	private static void DFScomponentVisit(mxNode u, ArrayList<mxNode> listOfSources, ArrayList<mxNode> listOfSinks) {
+	private static void DFScomponentVisit(Node<?> u, ArrayList<Node<?>> listOfSources, ArrayList<Node<?>> listOfSinks) {
 		//mark U
 		if(u.getDetectionCycle()==2){
 			return;
@@ -83,10 +76,10 @@ public class SPGCreator {
 			listOfSources.add(u);
 		}
 
-		for(mxNode v: u.getChildren()){
+		for(Node<?> v: u.getChildren()){
 			DFScomponentVisit(v,listOfSources,listOfSinks);
 		}
-		for(mxNode v: u.getParents()){
+		for(Node<?> v: u.getParents()){
 			DFScomponentVisit(v,listOfSources,listOfSinks);
 		}
 
@@ -97,24 +90,24 @@ public class SPGCreator {
 	 * a graph with cycles is not an SP graph
 	 * @param nodes
 	 */
-	public static boolean cycleDetection(List<mxNode> sources){
+	public static boolean cycleDetection(List<Node<?>> sources){
 		System.out.println("enter cycle detection");
 
-		for(mxNode v: sources){
+		for(Node<?> v: sources){
 			DFSvisit(v);//this function throws error if cycle detected
 		}
 		//no cycle has been detceted
 		return false;
 	}
 
-	public static boolean DFSvisit(mxNode u){
+	public static boolean DFSvisit(Node<?> u){
 		//color u-> grey, grey is -1
 		if(u.getDetectionCycle()==1){
 			return true;
 		}
 		u.setDetectionCycle(-1);
 		System.out.println("start: "+u.getDetectionCycle());
-		for(mxNode v: u.getChildren()){
+		for(Node<?> v: u.getChildren()){
 			System.out.println("child: "+v.getDetectionCycle());
 			//white is 0
 			if(v.getDetectionCycle()== 0){
