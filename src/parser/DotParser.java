@@ -8,7 +8,7 @@ import java.util.HashMap;
 import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.Parser;
 
-import serieparallel.SPGCreator;
+import viewer.stepbystep.mxNode;
 
 public class DotParser {
 	Parser parser;
@@ -30,22 +30,30 @@ public class DotParser {
 		
 		//Pour chaque graphe :
 		HashMap<String, serieparallel.Node<?>> mapOfNodes = new HashMap<>();
+		System.out.println("Le fichier dot contient "+graphs.size()+" graphes");
 		for(com.alexmerz.graphviz.objects.Graph graph : graphs) {
 			//On récupère tous les noeuds/arcs
 			ArrayList<com.alexmerz.graphviz.objects.Node> nodes = graph.getNodes(false); //Pas de sous-graphe considéré.
 			ArrayList<com.alexmerz.graphviz.objects.Edge> edges = graph.getEdges();
 			//On transforme chaque noeud obtenu en Node et on le met dans une hashmap (id, value)
 			for(com.alexmerz.graphviz.objects.Node node : nodes) {
-				String label = node.getId().getLabel();
+				String label = node.getId().getId();
 				@SuppressWarnings({ "unchecked", "rawtypes" })
-				serieparallel.Node<?> n = new serieparallel.Node(node.getId().getId(), label);
+				serieparallel.Node<?> n = new serieparallel.Node(label, label);
 				mapOfNodes.put(n.getId(), n);
+				System.out.println("added node "+n.getValue());
 			}
 			//On relie nos Node selon les arcs obtenus avec le parser
 			for(com.alexmerz.graphviz.objects.Edge edge : edges) {
 				String src = edge.getSource().getNode().getId().getId();
 				String dest = edge.getTarget().getNode().getId().getId();
-				mapOfNodes.get(src).connect(mapOfNodes.get(dest));
+				
+				serieparallel.Node<?> srcN = mapOfNodes.get(src);
+				if(srcN==null)System.out.println("src is null");
+				serieparallel.Node<?> destN = mapOfNodes.get(dest);
+				if(destN==null)System.out.println("dest is null");
+				srcN.connect(destN);
+				System.out.println("created edge between "+srcN.getValue()+" and "+destN.getValue());
 			}
 			//On détermine alors les sources et les sinks de notre Graph
 			@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -53,8 +61,14 @@ public class DotParser {
 			ArrayList<serieparallel.Node<?>> listOfSources = new ArrayList<>();
 			ArrayList<serieparallel.Node<?>> listOfSinks = new ArrayList<>();
 			for(serieparallel.Node<?> node : listOfNodes) {
-				if(node.getParents().isEmpty()) listOfSources.add(node);
-				if(node.getChildren().isEmpty()) listOfSinks.add(node);
+				if(node.getParents().isEmpty()) {
+					listOfSources.add(node);
+					System.out.println(node.getValue()+" is a source.");
+				}
+				if(node.getChildren().isEmpty()) {
+					listOfSinks.add(node);
+					System.out.println(node.getValue()+" is a sink.");
+				}
 			}
 			//On crée alors notre graph et on le compose en parallèle au graph final
 			serieparallel.Graph interGraph = new serieparallel.Graph(listOfSources, listOfSinks);
