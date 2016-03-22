@@ -23,12 +23,12 @@ public class PositionSerieParallelAlgo{
 		forks = new ArrayDeque<>();
 		associateNodes = new ArrayDeque<>();
 		//Trouver la profondeur
-		System.out.println("mxFIND DEPTH STARTED");
+		//System.out.println("mxFIND DEPTH STARTED");
 		for(Node<?> node : sp.getSources()) {
 			findDepthMax(node, 0);
 		}
-		System.out.println("depth :"+graphDepth);
-		System.out.println("mxFIND DEPTH ENDED");
+		//System.out.println("depth :"+graphDepth);
+		//System.out.println("mxFIND DEPTH ENDED");
 		next = new float[graphDepth+1];
 		offset = new float[graphDepth+1];
 		//draw(mxGraph.getSources().get(0), null);
@@ -69,8 +69,8 @@ public class PositionSerieParallelAlgo{
 		if(graphDepth<depth) graphDepth=depth;
 	}
 	
-	private synchronized void placeFathers(Node<?> node, int depth) throws InterruptedException {
-		System.out.println("(Fathers) Node : "+node.id);
+	private void placeFathers(Node<?> node, int depth) throws InterruptedException {
+		//System.out.println("(Fathers) Node : "+node.id);
 		//Placer l'ordonnée
 		if(depth>node.y) {
 			if(!nodeOnYaxis[depth].contains(node)) 
@@ -101,7 +101,7 @@ public class PositionSerieParallelAlgo{
 		
 		//maj prochaine place disponible à cette profondeur.
 		
-			next[depth] = Math.max(next[depth]+1, node.x+1);
+		next[depth] = Math.max(next[depth], node.x+1);
 		if(node.tag==0) {
 			if(nbChildren>1) {
 				forks.push(nbChildren);
@@ -111,11 +111,11 @@ public class PositionSerieParallelAlgo{
 		
 		
 		// On mémorise le décalage à appliquer au sous-arbre lors de la deuxième passe.
-		node.offset = offset[depth];	
+		//node.offset = offset[depth];	
 		node.tag=1;
 	}
 	private void placeSons(Node<?> node) {				
-		System.out.println("(Sons) Node : "+node.id);
+		//System.out.println("(Sons) Node : "+node.id);
 		for(Node<?> child : node.getChildren()) {
 			placeSons(child);
 		}

@@ -60,6 +60,8 @@ public class Window extends JFrame implements ActionListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(400, 320);
 		setVisible(true);
+		
+		cells = new ArrayList<>();
 	}
 	
 	private void initializeMenu() {
@@ -89,7 +91,7 @@ public class Window extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==open) { 
-			JFileChooser chooser = new JFileChooser("/media/tanguinoche/Data/");
+			JFileChooser chooser = new JFileChooser("/media/tanguinoche/Data/workspace/PSTL/samples");
 		    FileNameExtensionFilter filter = new FileNameExtensionFilter("fichier dot", "dot");
 		    chooser.setFileFilter(filter);
 		    int returnVal = chooser.showOpenDialog(this);
@@ -102,7 +104,7 @@ public class Window extends JFrame implements ActionListener {
 		}
 		
 		if(e.getSource()==saveAs) { 
-			JFileChooser chooser = new JFileChooser("D:\\workspace");
+			JFileChooser chooser = new JFileChooser("/media/tanguinoche/Data/workspace/PSTL");
 		    FileNameExtensionFilter filter = new FileNameExtensionFilter("Image files", "png", "jpeg", "bmp");
 		    chooser.setFileFilter(filter);
 		    int returnVal = chooser.showOpenDialog(this);
@@ -127,7 +129,7 @@ public class Window extends JFrame implements ActionListener {
 		System.out.println("Parsing file...");
 		DotParser parser = null;
 		try {
-			parser = new DotParser("samples/serie02.dot");
+			parser = new DotParser(file);
 		} catch (FileNotFoundException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -141,9 +143,9 @@ public class Window extends JFrame implements ActionListener {
 		
 		System.out.println("Building view...");
 		
-		cells = new ArrayList<>();
+		cells.clear();
 		
-
+		mxGraph.removeCells(mxGraph.getChildVertices(mxGraph.getDefaultParent())); //remove previous graph
 		mxGraph.getModel().beginUpdate();		
 		for(Node<?> node : graph.getSources())
 			draw(node);
@@ -180,6 +182,8 @@ public class Window extends JFrame implements ActionListener {
 		}
 			
 		//System.out.println("add edge "+parent.getValue()+"->"+cell.getValue());
+		//TODO : attention, if faut vérifier si on a déjà dessiné cet edge également !
+		//Du style parent.hasEdgeTo(cell) ?
 		mxGraph.insertEdge(gParent, null, null, parent, cell);
 		
 		for(Node<?> son : child.getChildren()) {
