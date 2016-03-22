@@ -16,6 +16,7 @@ public class Node<T> extends Point.Float {
 	public float offset;
 	public int tag = 0;
 	public int detectionCycle;
+	public int color = 0;
 
 	
 	/**
@@ -143,6 +144,14 @@ public class Node<T> extends Point.Float {
 	
 	public void setDetectionCycle(int i){
 		this.detectionCycle = i;
+	}
+	
+	public int getColor() {
+		return color;
+	}
+	
+	public void setColor(int i){
+		this.color = i;
 	}
 	
 }

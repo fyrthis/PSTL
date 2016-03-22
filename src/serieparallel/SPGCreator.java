@@ -2,6 +2,7 @@ package serieparallel;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
 public class SPGCreator {
 
@@ -40,7 +41,7 @@ public class SPGCreator {
 		ArrayList<Node<?>> listOfSinks = new ArrayList<>();
 		//DFS that separates different components and creates SPGraph for each connected component
 		Graph component = null;
-		
+
 		Iterator<Node<?>> it = listOfSources.iterator();
 		while (it.hasNext()) {
 			Node<?> u = it.next();
@@ -128,6 +129,48 @@ public class SPGCreator {
 	 * @param nodes
 	 */
 	public static void transitiveSupression(ArrayList<Node<?>> nodes){
+
+	}
+	/**
+	 * Algorithm that detects if the graph is an SPGraph
+	 * @param start
+	 */
+	public static void DetectionSPGraph(Node<?> start, Stack<Node<?>> forks ){
+		//black =2 end of treatment 
+		//grey = 1 in treatment
+		//white = 0 before treatment
+		if (start.getColor()==2){
+			return;
+		}
+		if (start.getColor()==1){
+			//a cycle is detected= problem
+			throw new Error();
+		}
+		//checks if fork
+		if(start.getChildren().size()>1){
+			//push start to fork stack
+			forks.push(start);
+		}
+
+		//checks if join
+		if(start.getParents().size()>1){
+			//stock couple <fork, join>, not yet implemented, with poped fork
+			Node<?> n= forks.pop();
+			/*
+			 * this version is only compatible with a basic SP where each fork has one join
+			 */
+			if(n==null){
+				//no fork is found for the join in treatment
+				throw new Error();
+			}
+		}
+
+		for(Node<?> child: start.getChildren()){
+			DetectionSPGraph(child, forks);
+		}
+
+		// end of treatment
+		start.setColor(2);
 
 	}
 
