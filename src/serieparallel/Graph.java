@@ -6,9 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import viewer.stepbystep.mxGraph;
-import viewer.stepbystep.mxNode;
-
 public class Graph implements Iterable<Graph> {
 
 	public Graph next;

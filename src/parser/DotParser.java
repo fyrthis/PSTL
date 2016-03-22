@@ -8,8 +8,6 @@ import java.util.HashMap;
 import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.Parser;
 
-import viewer.stepbystep.mxNode;
-
 public class DotParser {
 	Parser parser;
 	public DotParser(String fileName) throws FileNotFoundException, ParseException {
