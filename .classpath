@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="C:/Users/Pouletta/git/PSTL/lib/graphviz0_8_3beta.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Pouletta/git/PSTL/lib/jgraphx.jar"/>
+	<classpathentry kind="lib" path="/media/tanguinoche/Data/workspace/PSTL/lib/graphviz0_8_3beta.jar"/>
+	<classpathentry kind="lib" path="/media/tanguinoche/Data/workspace/PSTL/lib/jgraphx.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

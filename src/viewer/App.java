@@ -13,6 +13,7 @@ import com.alexmerz.graphviz.ParseException;
 import parser.mxDotParser;
 import viewer.stepbystep.GraphComponent;
 import viewer.stepbystep.mxGraph;
+import viewer.stepbystep.mxGraphInstance;
 import viewer.stepbystep.mxThread;
 
 public class App extends JFrame implements ActionListener{
@@ -34,7 +35,7 @@ public class App extends JFrame implements ActionListener{
 		mxDotParser parser;
 		try {
 			parser = new mxDotParser("samples/random-dag/g.50.8.graphml.dot");
-			mxGraph graph = parser.getGraph();
+			mxGraph graph = mxGraphInstance.one();//parser.getGraph();
 			if(graph==null) System.out.println("graph is null");
 			mxThread thread = new mxThread(graph);
 			tabs.add("tab1",new GraphComponent(thread));

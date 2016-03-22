@@ -8,9 +8,11 @@ import com.mxgraph.model.mxGeometry;
 import serieparallel.Node;
 
 public class mxNode extends mxCell {
+	private static final long serialVersionUID = 4836175817583742945L;
 	public Node n;
 	private ArrayList<mxNode> children = new ArrayList<mxNode>();
 	private ArrayList<mxNode> parents = new ArrayList<mxNode>();
+	public int tag=0;
 	int detectionCycle;// for cycle detection in SPGCreator
 	
 	public mxNode(Node n)

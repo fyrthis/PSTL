@@ -48,25 +48,25 @@ public class Viewer extends JFrame{
 		mxCell cell = (mxCell) mxGraph.insertVertex(gParent, null, node.value, node.x*scale, node.y*scale, widthCell, heightCell);
 		mxGraph.addCell(cell);
 		cells.add(cell);
-		System.out.println(cell.getValue()+" created.");
+		System.out.println(cell.getValue()+" created."+node.tag);
 		for(Node<?> child : node.getChildren()) {
 			draw(cell, child);
 		}
 		
-		node.tag=0;
+		node.tag=1;
 	}
 
 	private void draw(mxCell parent, Node<?> child) {
 		mxCell cell = null;
-		//System.out.println("child "+child.getValue()+" ["+child.x+","+child.y+"]"+child.tag);
-		if(child.tag==1) { //On n'est jamais passé par child
+		System.out.println("child "+child.getValue()+" ["+child.x+","+child.y+"]"+child.tag);
+		if(child.tag==0) { //On n'est jamais passé par child
 			cell = (mxCell) mxGraph.insertVertex(gParent, null, child.value, child.x*scale, child.y*scale, widthCell, heightCell);
 			cells.add(cell);
 			System.out.println(cell.getValue()+" created.");
-			child.tag=0;
+			child.tag=1;
 		} else { //On a déjà fait une cellule pour child
 			for(mxCell c : cells) {
-				System.out.println(c.getValue()+" == "+parent.getValue());
+				System.out.println(c.getValue()+" == "+child.getValue());
 				if(c.getValue().equals((child.getValue()))) {
 					cell = c;
 					break;
@@ -87,8 +87,8 @@ public class Viewer extends JFrame{
 	{
 		Viewer frame;
 		try {
-			Graph g = new DotParser("samples/random-dag/g.50.8.graphml.dot").getGraph();
-			//Graph g = new DotParser("samples/random-dag/serie01.dot").getGraph();
+			//Graph g = new DotParser("samples/random-dag/g.50.8.graphml.dot").getGraph();
+			Graph g = new DotParser("samples/serie02.dot").getGraph();
 			new ThreadAlgo(g);
 			frame = new Viewer(g);		
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

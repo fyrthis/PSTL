@@ -10,7 +10,6 @@ public class mxThread extends Thread {
 
 	viewer.stepbystep.mxGraph sp;
 	mxGraphComponent graphcp;
-	private ArrayList<mxNode> vertices;
 	private mxGraph graph = new mxGraph();
 	private Object gParent = graph.getDefaultParent();
 	int step = 50;
@@ -46,6 +45,11 @@ public class mxThread extends Thread {
 			for(mxNode node : sp.getSources()) {
 				System.out.println("mxPLACE FATHERS STARTED");
 				placeFathers(node, 0);
+				System.out.println("mxPLACE FATHERS ENDED");
+			}
+			for(mxNode node : sp.getSources()) {
+				System.out.println("mxPLACE FATHERS STARTED");
+				placeSonsv2(node, graphDepth);
 				System.out.println("mxPLACE FATHERS ENDED");
 			}
 			//placeSons(sp.getSinks().get(0));
@@ -97,6 +101,7 @@ public class mxThread extends Thread {
 		} else
 			place = (node.getChildren().get(0).n.x + node.getChildren().get(nbChildren-1).n.x) / 2;
 		
+		
 		//calcul éventuel décalage engendré. Si on l'a décalé à cause de ses fils.
 		offset[depth] = Math.max(offset[depth], next[depth]-place);
 		
@@ -104,27 +109,69 @@ public class mxThread extends Thread {
 		if (nbChildren != 0)
 			node.setX(place + offset[depth]);
 		
-		myTurn=false;
-		while(stepByStep && !myTurn)
-			wait();
+		
+//		myTurn=false;
+//		while(stepByStep && !myTurn)
+//			wait();
 		node.setVisible(true);
-		graph.refresh();
+//		graph.refresh();
 		
 		//maj prochaine place disponible à cette profondeur.
+		if(node.tag==0)
 		next[depth] = node.n.x+1;
 		
 		// On mémorise le décalage à appliquer au sous-arbre lors de la deuxième passe.
 		node.n.offset = offset[depth];	
+		node.tag=1;
 	}
-	
+	private void placeSonsv2(mxNode node, int depth) {				
+
+		//Récurrence sur les parents
+		for(mxNode parent : node.getParents())
+			placeSonsv2(parent, depth+1);
+
+		//Calcul position fils par rapport parent
+		int nbParents = node.getParents().size(); 
+		int place = 0;
+		if (nbParents == 0) {
+			place = next[depth];
+			node.setX(place);
+		} else
+			place = (node.getParents().get(0).n.x + node.getParents().get(nbParents-1).n.x) / 2;
+
+
+		//calcul éventuel décalage engendré. Si on l'a décalé à cause de ses fils.
+		offset[depth] = Math.min(offset[depth], next[depth]-place);
+
+		//Application décalage profondeur.
+		if (nbParents != 0)
+			node.setX(place + offset[depth]);
+
+
+		//				myTurn=false;
+		//				while(stepByStep && !myTurn)
+		//					wait();
+		node.setVisible(true);
+		//				graph.refresh();
+
+		//maj prochaine place disponible à cette profondeur.
+		if(node.tag==1)
+			next[depth] = node.n.x+1;
+
+		// On mémorise le décalage à appliquer au sous-arbre lors de la deuxième passe.
+		node.n.offset = offset[depth];	
+		node.tag=0;
+	}
 	private void placeSons(mxNode node) {
 		if(node==sp.getSources().get(0)) return;
 		
 		for(mxNode parent : node.getParents())
 			placeSons(parent);
 
-		if (node.getParents().isEmpty() || (node.getParents().size()==1) ) {
-			//DO NOTHING
+		if (node.getParents().isEmpty()) {
+			//IS ROOT, DO NOTHING
+		} else if (node.getParents().size()==1) {
+			node.n.x = node.getParents().get(0).n.x;
 		} else {
 			int newXMaybe = ((node.getParents().get(0).n.x + node.getParents().get(node.getParents().size()-1).n.x) / 2);
 			if(newXMaybe < node.n.x) {
