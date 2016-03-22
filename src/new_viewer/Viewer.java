@@ -16,6 +16,7 @@ import serieparallel.Graph;
 import serieparallel.Node;
 
 public class Viewer extends JFrame{
+	private static final long serialVersionUID = 917181741897041933L;
 	private mxGraph mxGraph;
 	private Object gParent;
 	private mxGraphComponent graphComponent;
@@ -89,7 +90,7 @@ public class Viewer extends JFrame{
 		try {
 			//Graph g = new DotParser("samples/random-dag/g.50.8.graphml.dot").getGraph();
 			Graph g = new DotParser("samples/serie02.dot").getGraph();
-			new ThreadAlgo(g);
+			new PositionSerieParallelAlgo(g);
 			frame = new Viewer(g);		
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setSize(400, 320);

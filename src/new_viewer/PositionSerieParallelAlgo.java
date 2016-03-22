@@ -7,7 +7,7 @@ import java.util.Deque;
 import serieparallel.Graph;
 import serieparallel.Node;
 
-public class ThreadAlgo{
+public class PositionSerieParallelAlgo{
 
 	Graph sp;
 	private ArrayList<Node<?>> nodeOnYaxis[];
@@ -18,7 +18,7 @@ public class ThreadAlgo{
 	private Deque<Node<?>> associateNodes;
 	
 	
-	public ThreadAlgo(Graph graph) {
+	public PositionSerieParallelAlgo(Graph graph) {
 		this.sp=graph;
 		forks = new ArrayDeque<>();
 		associateNodes = new ArrayDeque<>();
