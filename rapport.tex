@@ -1,0 +1,232 @@
+\documentclass[11pt]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[x11names]{xcolor}   % Accès à une table de 317 couleurs
+\usepackage{graphicx} %Pur utiliser la colorbox
+\usepackage{textcomp}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[ruled]{algorithm2e}
+
+\title{\textbf{PSTL \\ Visualisation de Graphes Séries-Parallèles}}
+\author{GRUENPETER Morane, RETAIL Tanguy}
+\date{22/01/2016}
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\chapter{Introduction}
+\section{Sujet}
+Les récents progrès de la génération aléatoire permettent de nombreuses applications, notamment en algorithmique expérimentale (simulations), en physique, en bio-informatique ou encore au niveau du génie logiciel. Les générateurs de structures combinatoires nous permettent de générer uniformément des graphes (par exemple des arbres ou des graphes séries-parallèles) de plusieurs millions de noeuds en à peine quelques secondes. Habituellement, ces graphes sont stockés dans des fichiers textes structurés (dot, xml, ...). On veut naturellement obtenir une visualisation graphique de tels objets.
+\newline
+Il existe plusieurs outils permettant de visualiser des graphes quelconques en utilisant des algorithmes souvent coûteux, le plus connu étant graphviz. Dans le cas des arbres, il existe un \textbf{algorithme de visualisation en temps linéaire} (en nombre de noeuds) qui a été implémenté dans deux outils, l’un en Python (lors d’un précédent PSTL) et l’autre en Ocaml. Nous aimerions \textbf{adapter cet algorithme} à une autre classe de graphes que sont les \textbf{graphes séries-parallèles}. Une première partie du projet consistera en une étude théorique menant à la création d’un algorithme efficace de visualisation de graphes séries-parallèles. Pour ce faire, une compréhension de l’algorithme existant pour les arbres sera nécessaire, afin de l’adapter à ces nouveaux besoins. Une seconde partie, pratique, consistera à \textbf{implémenter cet algorithme} dans un langage au choix. L’implémentation permettra un \textbf{rendu des graphes sous plusieurs formats} (en utilisant graphviz, svg, ...) mais particulièrement sous forme de figure TikZ. TikZ est un ensemble de macro de dessin pour le langage Tex, langage dominant dans la rédaction et publication de contenu scientifique.
+\newline
+\newline
+Les tâches à effectuer :
+\begin{itemize}
+    \item s’approprier l’usage du visualiseur d’arbres 
+    \item adapter l’algorithme de visualisation afin d’afficher des graphes séries-parallèles 
+    \item s’approprier l’usage de LateX et de sa bibliothèque tikz 
+    \item implémenter l’algorithme (langage au choix) afin de générer le code tikz encodant la visualisation du graphe
+    \item éventuellement enrichir les possibilités d’affichage
+\end{itemize}
+\section{Préface}
+
+\chapter{Les Graphes Séries-Parallèles (SPG)}
+\section{Définitions}
+\subsection{Généralités}
+TODO : Définition récursive des SPG
+\subsection{Compositions}
+\subsubsection{Composition en série}
+TODO : Qu'est-ce qu'une composition en série
+\subsubsection{Composition en parallèle}
+TODO : Qu'est-ce qu'une composition en parallèle
+\section{Contexte, théorie des ordres partiels (POSET)}
+TODO : Lien avec la théorie des ordres partiels, pourquoi le SPG est-il équivalent, comment ça peut nous aider.
+\section{Structure de données et représentation}
+\section{Reconnaissance}
+TODO : Comment reconnaitre un SPG, quels outils ?
+\subsection{Détection de cycle}
+TODO : Explication de l'utilité de détection de cycle (Pas de cycle dans un SPG) + pseudo-code 
+\subsection{Composantes connexes}
+TODO : Explication de l'utilité des composantes connexes + pseudo-code 
+\subsection{Complexité}
+TODO : Au final, complexité pour la reconnaissance ? (Devrait être linéaire ? Au pire n2 ?)
+
+\chapter{Visualisation d'un arbre (from TreeDisplay)}
+TODO : Dire qu'on s'est basé sur les recherches du TreeDisplay d'un pstl précédent
+\section{Algorithme linéaire}
+TODO : Présentation du pseudo-code de l'algorithme
+\section{Explications et fonctionnement}
+TODO : Explications de l'algorithme, pourquoi et comment ça fonctionne, pourquoi c'est linéaire.
+
+\chapter{Visualisation de Graphes Séries-Parallèles}
+\section{Différences avec un arbre}
+TODO : Leur algo nous convient à moitié, explications des différences majeures avec les SPG
+\section{Contraintes supplémentaires}
+TODO : Donc finalement, les contraintes d'affichage en plus et/ou en moins pour les SPG. Que doit-on faire.
+\section{Algorithme}
+\subsection{Etape 1}
+TODO : A renommer + pseudo-code et explications + complexité
+\subsection{Etape 2}
+TODO : A renommer + pseudo-code et explications + complexité
+\subsection{Etape 3}
+TODO : A renommer + pseudo-code et explications + complexité
+\subsection{Etape 4}
+TODO : A renommer + pseudo-code et explications + complexité
+\section{Complexité}
+TODO : complexité totale
+
+\chapter{Implémentation dans le cadre du PSTL}
+\section{Algorithmes}
+TODO : Sum up des algo utilisés, complexité totale avec et sans reconnaissance.
+\section{Parseur}
+TODO : Parseur pour le format DOT,a-t-on le temps d'en faire un autre format rapidement ?
+\section{Générateur}
+TODO : Génération d'image (PNG, JPEG, BMP)
+TODO : Génération pour TIKZ, a-t-on le temps d'en faire d'autre ?
+\section{Interface Graphique}
+TODO : Présentation rapide du logiciel et de son interface d'affichage (sans oublier de préciser que le temps d'affichage par swing peut prendre un moment...)
+TODO : A-t-on le temps de faire en sorte de pouvoir rajouter des choses dynamiquement ? En gros, permettre de faire des compositions "en live" de plusieurs fichiers dot par exemple, et modifier les étiquettes des noeuds, etc...)
+\chapter{Conclusion}
+TODO : A faire deux sections : Une première pour la conclusion en elle-même, une seconde pour les ouvertures et suites envisageables.
+
+\chapter{Annexe}
+\section{Prise en main rapide}
+TODO : Prise en main rapide de notre logiciel, ne devrait pas être trop long.
+TODO : Peut-être des choses à rajouter dans les annexes ?
+\section{Bibliographie}
+TODO : Ne pas oublier la biblio !
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    A PARTIR D'ICI, BROUILLON !    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+BROUILLONBROUILLONBROUILLONBROUILLONBROUILLONBROUILLON
+\section{Définitions}
+\subsection{Graphe Série-parallèle sujet}
+Le plus petit SP : un seul noeud
+
+\subsection{Graphe Série-parallèle}
+Un graphe série parallèle est un ensemble non vide de graphes complets $K_2:1$, auquels on définit un noeud $source$ et un noeud $sink$, et composés récursivement en série ou en parallèle.
+\subsection{Compositions}
+Illustration des compositions : \\
+$https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Series_parallel_composition.svg/347px-Series_parallel_composition.svg.png$\\
+Dans cette section on note G(a,b) le graphe serie-parallel G de noeud source a, et de noeud sink b.\\
+On note la composition série $\wedge$, du fait que pour aller de la source à la sink, il faut passer par l'un, puis par l'autre.\\
+On note la composition parallèle $\vee$, du fait que pour aller de la source à la sink, il faut passer par l'un, ou par l'autre.
+\subsubsection{Série}
+The series composition Sc = Sc(X,Y) of two TTGs X and Y is a TTG created from the disjoint union of graphs X and Y by merging the sink of X with the source of Y. The source of X becomes the source of Sc and the sink of Y becomes the sink of Sc.\\
+Moins formellement, si on a deux graphes $G_1(a,b)$ et $G_2(c,d)$, alors $G_1 \wedge G_2$ est un nouveau graphe serie parallele de source a et de sink d et dans lequel on a fait l'addition des noeuds b et c.\\
+\subsubsection{Parallèle}
+The parallel composition Pc = Pc(X,Y) of two TTGs X and Y is a TTG created from the disjoint union of graphs X and Y by merging the sources of X and Y to create the source of Pc and merging the sinks of X and Y to create the sink of Pc.\\
+Moins formellement, si on a deux graphes $G_1(a,b)$ et $G_2(c,d)$, alors $G_1 \vee G_2$ est un nouveau graphe serie parallele de source e et de sink f et dans lequel on a fait les additions a+c=e et b+d=f.\\
+\\
+\\
+Rmq:series-parallel graph composition:\\
+parallel graph composition: it is a commutative operation (for unlabelled graphs),\\
+series graph composition: it is a non-commutative operation,\\
+source graph composition: it is a commutative operation (for unlabelled graphs);\\
+\subsection{Profondeur}
+On définit la profondeur d'un graphe serie-parallel comme étant le chemin le plus long de la source vers la sink. On graphe serie-parallel a donc une profondeur minimale de 1
+\subsection{Conclusions, à prouver}
+-De part les définitions précédentes, un noeud A ne peut avoir pour pères B et C si B est un ancètre ou un descendant de C.\\
+-De suite, il est possible de dessiner le graphe tout en évitant les intersections des arcs.\\
+
+\section{Algorithme d'affichage}
+\subsection{Algorithme pour arbre n-aire}
+\subsubsection{pseudo-code}
+\begin{algorithm}[H]
+step : step between nodes\\
+ \KwData{Node node ; int dept=0}
+ \KwResult{void}
+ node.y = depth*step\;
+ \For{$Node$ $child$ : $node.getChildren()$}{
+    $computeDown(child, depth+1)$\;
+ }
+ $int$ $nbChildren = node.getChildren().size()$\; 
+ $int$ $place = 0$\;
+\eIf{$nbChildren = 0$}{
+   $place \leftarrow next[depth]$\;
+   $node.x \leftarrow place$\;
+}{
+   $place \leftarrow (node.getChildren().get(0).x + node.getChildren().get(nbChildren-1).x) /2$\;
+}
+$offset[depth] = Math.max(offset[depth], next[depth]-place)$\;
+\If{nbChildren != 0}{
+    $node.x = place + offset[depth]$\;
+}
+$next[depth] = n.x+step$\;
+$node.offset = offset[depth]$\;
+ \caption{computeDown(Node, int) \textbf{[$\mathcal{O(N)}$]}}
+\end{algorithm}
+
+\begin{algorithm}[H]
+step : step between nodes\\
+ \KwData{Node node ; int offsum=0}
+ \KwResult{void}
+ $node.x = node.x + offsum$\;
+ $ offsum += n.offset$\;
+ \For{$Node$ $child$ : $node.getChildren()$}{
+    $addOffsets(child, offsum)$\;
+ }
+ \caption{addOffsets(Node, int) \textbf{[$\mathcal{O(N)}$]}}
+\end{algorithm}
+\subsubsection{Analyse}
+Dans l'algorithme 1, on parcourt l'arbre de manière infixe afin de placer un noeud par rapport à ses fils, en fonction de la place disponible. Si la place voulue n'est pas disponible, on retient la différence entre la place voulue et la place reçue.\\
+\\
+C'est ici qu'est l'astuce :
+Dans le même algorithme, on aurait re-parcouru le sous-arbre pour faire un décalage immédiat. Or si à chaque fois que l'on remonte un parent on doit décaler son sous-arbre, on pourrait le faire potentiellement \textbf{$\mathcal{O(N^2)}$} fois.\\
+Pour éviter celà, on a juste retenu le décalage, et on va redescendre l'arbre une unique fois en sommant les décalages à la descente.\\
+\subsubsection{Conclusion}
+
+\subsection{Algorithme pour graphe serie-parallel}
+\subsubsection{Contraintes}
+Noeuds parents centrés vis-à-vis de leurs enfants, si ils en ont plusieurs. (abscisse)\\
+Noeuds enfants centrés vis-à-vis de leurs parents, si ils en ont plusieurs. (abscisse)\\
+Les noeuds sont placés en fonction de leur profondeur.                      (ordonnée)\\
+Les arcs ne doivent pas s'intersecter.\\
+Un même sous-arbre est dessiné de la même manière, peu importe sa place.\\
+
+\subsubsection{Analyse}
+
+\subsubsection{pseudo-code}
+\subsubsection{Conclusion}
+
+\section{Parsing}
+
+\section{Export}
+
+\end{document}
