@@ -16,10 +16,7 @@ public class Node<T> extends Point.Float {
 	public float offset;
 	public int tag = 0;
 	public int detectionCycle;
-	public boolean visited = false;
-	public int visitedParents = 0;
-	public int color=0;
-	public int initialization=0;
+	public int color = 0;
 
 	
 	/**
@@ -44,6 +41,10 @@ public class Node<T> extends Point.Float {
 	 * @param node : node that will become child of this
 	 */
 	public void connect(Node<?> node) {
+//		if(!children.contains(node))
+//			this.children.add(node);
+//		if(!parents.contains(node))
+//			node.parents.add(this);
 		this.children.add(node);
 		node.getParents().add(this);
 	}
@@ -107,7 +108,16 @@ public class Node<T> extends Point.Float {
 	}
 	
 	public String toString() {
-		return this.id;
+		StringBuilder sb = new StringBuilder("Node[").append(x).append(',').append(y).append("] : ID=");
+		sb.append(id).append("\tValue=");
+		if(value==null) sb.append("null");
+		else {
+			if(value.toString().length() > 20)
+				sb.append(value.toString().subSequence(0, 20)).append("...");
+			else
+				sb.append(value.toString());
+		}
+		return sb.toString();
 	}
 	
 	public String valueToString(int length) {
@@ -135,13 +145,13 @@ public class Node<T> extends Point.Float {
 	public void setDetectionCycle(int i){
 		this.detectionCycle = i;
 	}
-
+	
 	public int getColor() {
- 		return color;
- 	}
- 	
- 	public void setColor(int i){
- 		this.color = i;
- 	}
+		return color;
+	}
+	
+	public void setColor(int i){
+		this.color = i;
+	}
 	
 }
