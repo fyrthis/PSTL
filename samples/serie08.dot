@@ -1,0 +1,14 @@
+digraph G {
+
+
+    n1 -> n2     [_graphml_id=e1];
+    n1 -> n3     [_graphml_id=e2];
+    n1 -> n4     [_graphml_id=e3];
+    n4 -> n8     [_graphml_id=e6];
+    n4 -> n9     [_graphml_id=e7];
+    n1 -> n6     [_graphml_id=e10];
+    n6 -> n7     [_graphml_id=e11];
+
+    
+}
+

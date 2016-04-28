@@ -105,18 +105,36 @@ public class Window extends JFrame implements ActionListener {
 		
 		if(e.getSource()==saveAs) { 
 			JFileChooser chooser = new JFileChooser("/media/tanguinoche/Data/workspace/PSTL");
-		    FileNameExtensionFilter filter = new FileNameExtensionFilter("Image files", "png", "jpeg", "bmp");
-		    chooser.setFileFilter(filter);
+		    FileNameExtensionFilter filterPNG = new FileNameExtensionFilter("PNG image", "png");
+		    FileNameExtensionFilter filterJPG = new FileNameExtensionFilter("JPG image", "jpeg", "jpg");
+		    FileNameExtensionFilter filterBMP = new FileNameExtensionFilter("BMP image", "bmp");
+		    chooser.addChoosableFileFilter(filterPNG);
+		    chooser.addChoosableFileFilter(filterJPG);
+		    chooser.addChoosableFileFilter(filterBMP);
+		    chooser.setAcceptAllFileFilterUsed(false);
 		    int returnVal = chooser.showOpenDialog(this);
 	        if (returnVal == JFileChooser.APPROVE_OPTION) {
 	            File file = chooser.getSelectedFile();
+	            String ext = StringTools.getFileExtension(file);
 	            BufferedImage image = mxCellRenderer.createBufferedImage(mxGraph, null, 1, Color.WHITE, true, null);
 	            try {
-					ImageIO.write(image, "PNG", file);
+	            	if(chooser.getFileFilter().equals(filterPNG)) {
+	            		if(ext.compareToIgnoreCase("png")!=0)
+	            			file = new File(file.getAbsolutePath()+".png");
+	            		ImageIO.write(image, "PNG", file);
+	            	} else if(chooser.getFileFilter().equals(filterJPG)) {
+	            		if(ext.compareToIgnoreCase("jpg")!=0 && ext.compareToIgnoreCase("jpeg")!=0)
+	            			file = new File(file.getAbsolutePath()+".jpg");
+	            		ImageIO.write(image, "JPG", file);
+	            	} else if(chooser.getFileFilter().equals(filterBMP)) {
+	            		if(ext.compareToIgnoreCase("bmp")!=0)
+	            			file = new File(file.getAbsolutePath()+".bmp");
+	            		ImageIO.write(image, "BMP", file);
+	            	} else 
+	            		System.err.println("Erreur, choix de filtre non reconnu lors de l'exportation en image.");
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				}
+				} 
 	        } else {
 	            System.err.println("Open file cancelled by user.");
 	        }
@@ -131,7 +149,6 @@ public class Window extends JFrame implements ActionListener {
 		try {
 			parser = new DotParser(file);
 		} catch (FileNotFoundException | ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -157,21 +174,20 @@ public class Window extends JFrame implements ActionListener {
 		mxCell cell = (mxCell) mxGraph.insertVertex(gParent, null, node.value, node.x*scale, node.y*scale, widthCell, heightCell);
 		mxGraph.addCell(cell);
 		cells.add(cell);
-		//System.out.println("add cell "+cell.getValue());
 		for(Node<?> child : node.getChildren()) {
 			draw(cell, child);
 		}
 		
-		node.tag=1;
+		node.tag=0;
 	}
 
 	private void draw(mxCell parent, Node<?> child) {
 		mxCell cell = null;
-		if(child.tag==0) { //On n'est jamais passé par child
+		if(child.tag==1) { //On n'est jamais passé par child
 			cell = (mxCell) mxGraph.insertVertex(gParent, null, child.value, child.x*scale, child.y*scale, widthCell, heightCell);
 			cells.add(cell);
 			//System.out.println("add cell "+cell.getValue());
-			child.tag=1;
+			child.tag=0;
 		} else { //On a déjà fait une cellule pour child
 			for(mxCell c : cells) {
 				if(c.getValue().equals((child.getValue()))) {
@@ -181,10 +197,15 @@ public class Window extends JFrame implements ActionListener {
 			}
 		}
 			
-		//System.out.println("add edge "+parent.getValue()+"->"+cell.getValue());
-		//TODO : attention, if faut vérifier si on a déjà dessiné cet edge également !
-		//Du style parent.hasEdgeTo(cell) ?
-		mxGraph.insertEdge(gParent, null, null, parent, cell);
+
+		boolean drawn = false;
+		for(int i =0 ; i<cell.getEdgeCount(); i++) {
+			mxCell edge = (mxCell) cell.getEdgeAt(i);
+			if(edge.getSource().equals(parent) && edge.getTarget().equals(cell)) {
+				drawn = true;
+			}
+		}
+		if(!drawn) mxGraph.insertEdge(gParent, null, null, parent, cell);
 		
 		for(Node<?> son : child.getChildren()) {
 			draw(cell, son);
