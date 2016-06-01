@@ -18,8 +18,17 @@ public class PositionSerieParallelAlgo {
 
 	private PairHandler pairsList;
 	boolean b = false;
-	int nbPasses=0;
-	int nbPasses2=0;
+	int nbInitialize =0;
+	int nbComputeTree =0;
+	int nbOffsets =0;
+	int computeDiadmonds =0;
+
+	public int getNbInitialize() { return nbInitialize; }
+	public int getNbComputeTree() { return nbComputeTree; }
+	public int getNbOffsets() { return nbOffsets; }
+	public int getComputeDiadmonds() { return computeDiadmonds; }
+	public int getNbRecursiveCalls() { return nbInitialize+nbComputeTree+nbOffsets+computeDiadmonds; }
+
 
 
 	public PositionSerieParallelAlgo(Graph graph) {
@@ -28,11 +37,7 @@ public class PositionSerieParallelAlgo {
 		forkNodes = new LinkedList<>();
 		pairsList = new PairHandler();
 
-
 		run();
-		for(int i = forks.size(); i > 0 ; i--) {
-			System.out.println(forkNodes.pop()+" is a fork of "+forks.pop());
-		}
 	}
 
 
@@ -40,18 +45,18 @@ public class PositionSerieParallelAlgo {
 	public void run() {
 		try {
 			for(Node<?> node : sp.getSources()) {
-				initialize(node,0);			
+				findDepth(node,0);			
 			}
 			System.out.println("hauteur : "+graphDepth);
 			next = new float[graphDepth+1];
 			for(Node<?> node : sp.getSources()) {
-				computeTree(node);
+				initialization(node,0);
 			}
 			for(Node<?> node : sp.getSources()) {
 				applyOffsets(node, 0);
 			}
 			for(Node<?> node : sp.getSources()) {
-				computeDiamonds(node, 0);
+				applyDiadmondsOffsets(node, 0);
 			}
 		} catch (InterruptedException e) { e.printStackTrace();	}
 
@@ -65,94 +70,88 @@ public class PositionSerieParallelAlgo {
 	 *    = nombre de chemins passant par N 
 	 *    = nombre de parents de N
 	 */
-	private void initialize(Node<?> node, int depth) {
-		//System.out.println("initialize : "+nbPasses++);
-		if(depth>node.y || node.initialization == 0) {
+	private void findDepth(Node<?> node, int depth) {
+		nbInitialize++;
+		if(depth>node.y || node.findDepthTag == 0) {
 			node.y = depth;
 
 			if(graphDepth<depth) graphDepth=depth;
-			//node.visitedParents++;
 
-			node.initialization=1;
+			node.findDepthTag=1;
 			for(Node<?> child : node.getChildren()) {
-				initialize(child, depth+1);
+				findDepth(child, depth+1);
 			}
 		}
 	}
 
-	private void computeTree(Node<?> node) throws InterruptedException {
-
-
-		//		node.visitedParents--;
-		//		if(node.visitedParents==0) {
-		//			updateKnownDiamonds(node);
-		//		}
-		System.out.println("computeTree "+node+" passe : "+nbPasses++);
+	private void initialization(Node<?> node, float maxOnLinesUpside) throws InterruptedException {
+		nbComputeTree++;
 		boolean parentsAreVisited = true;
 		for(int i = 0; i < node.getParents().size() ; i++) {
-			if(node.getParents().get(i).visited == false) {
+			if(!node.getParents().get(i).visited) {
 				parentsAreVisited = false;
 				break;
 			}
 		}
-		if(!parentsAreVisited && node.tag==1)
+
+		if(!parentsAreVisited && node.initializationTag==1)
 			return;
 		
 		if(parentsAreVisited) {
-			System.out.println("first case "+node.id);
 			node.visited = true;
 			updateKnownDiamonds(node);
 		} 
 
-		for(Node<?> child : node.getChildren()) {
-			computeTree(child);
+		if(node.spaceTag==0) {
+			for(int i=0;i<graphDepth;i++) 
+			next[(int)node.y] = Math.max(next[(int)node.y], maxOnLinesUpside);
+			//for(int i=(int)node.y+1;i<graphDepth-1;i++) next[(int)node.y] = Math.max(next[(int)node.y], next[i]);
+			node.spaceTag=1;
 		}
-
-
-		if(node.tag==0) { //Si première fois qu'on passe par ce noeud
-			System.out.println("second case "+node.id);
+		
+		for(Node<?> child : node.getChildren()) {
+			initialization(child, (int)next[(int)node.y]);
+		}
+		
+		
+		if(node.initializationTag==0) { //Si première fois qu'on passe par ce noeud
 			int nbChildren = node.getChildren().size(); 
 			float placeSouhaite = 0;
 			if (nbChildren == 0) {
 				placeSouhaite = next[(int)node.y];
+				node.x = placeSouhaite;
 			}else {
 				placeSouhaite = (float) ((node.getChildren().get(0).x + node.getChildren().get(nbChildren-1).x) / 2.0);
+				node.x = Math.max(placeSouhaite, next[(int)node.y]);
 			}
-
-			node.x = Math.max(placeSouhaite, next[(int)node.y]);// + offset[(int)node.y];
 
 			//maj prochaine place disponible à cette profondeur.
 
 			next[(int)node.y] = Math.max(next[(int)node.y], node.x+1);
+			
+			
 			node.offset = Math.abs(node.x - placeSouhaite);//offset[(int)node.y];
-			node.tag = 1;
+			if(node.offset!=0)System.out.println("alert : "+node+" : "+node.offset );
+			node.initializationTag = 1;
 
 		}
 
 	}
 
 	private void applyOffsets(Node<?> node, float offsum) {
-		if(node.tag==1) {
+		nbOffsets++;
+		if(node.applyOffsetsTag==0) {
 			node.x += offsum;
+			System.out.println("on a ajouté "+offsum);
 			offsum += node.offset;
-
+			
 			node.offset = 0;
-			node.tag=0;
+			node.applyOffsetsTag=1;
 			for(Node<?> child : node.getChildren()) {
 				applyOffsets(child, offsum);
 			}
-
 		}
-
-
 	}
-
-
-
-
-
-
-
 
 	private void updateKnownDiamonds(Node<?> node) {
 		if(node.getParents().size() > 1) { //Si c'est un join
@@ -185,8 +184,9 @@ public class PositionSerieParallelAlgo {
 
 	}
 
-	private void computeDiamonds(Node<?> node, float offsum) {
-		if(node.tag==0) {
+	private void applyDiadmondsOffsets(Node<?> node, float offsum) {
+		computeDiadmonds++;
+		if(node.findDiadmondsTag==0) {
 			if(pairsList.containsKey(node)) {
 				if(pairsList.get(node)!=null) { //Join à associer avec son fork d'alignement
 					double off = Math.abs(pairsList.get(node).x - node.x);
@@ -199,10 +199,9 @@ public class PositionSerieParallelAlgo {
 
 			}
 			node.x += offsum;
-
-			node.tag=1;
+			node.findDiadmondsTag=1;
 			for(Node<?> child : node.getChildren()) {
-				computeDiamonds(child, offsum);
+				applyDiadmondsOffsets(child, offsum);
 			}
 		}
 

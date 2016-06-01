@@ -1,6 +1,8 @@
 package new_viewer;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -13,11 +15,17 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.alexmerz.graphviz.ParseException;
@@ -27,6 +35,7 @@ import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.view.mxGraph;
 
 import parser.DotParser;
+import parser.TikzExporter;
 import serieparallel.Graph;
 import serieparallel.Node;
 
@@ -36,6 +45,8 @@ public class Window extends JFrame implements ActionListener {
 	
 	private JMenuBar menu;
 	private JMenuItem open, saveAs, quit;
+	private JProgressBar progressBar;
+	private Graph graph;
 	
 	
 	private mxGraph mxGraph;
@@ -45,20 +56,40 @@ public class Window extends JFrame implements ActionListener {
 	int heightCell = 40;
 	private int scale = 80;
 	List<mxCell> cells;
+	
+	JLabel statusLabel;
 
 	public Window() {
 		super();
 		initializeMenu();
+		setLayout(new BorderLayout());
 		
-
+		//ProgressBar
+		progressBar = new JProgressBar();
+		progressBar.setMinimum(0);
+		getContentPane().add(progressBar);
+		progressBar.setVisible(false);
+		progressBar.setStringPainted(true);
+		
+		//Status bar
+		JPanel statusPanel = new JPanel();
+		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		this.add(statusPanel, BorderLayout.SOUTH);
+		statusPanel.setPreferredSize(new Dimension(this.getWidth(), 16));
+		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+		statusLabel = new JLabel("status : On mettra ici quelques infos (nbNoeuds, nbArcs, nbPasses pour algo positionnement");
+		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		statusPanel.add(statusLabel);
+		
+		//Graph
 		mxGraph = new mxGraph(); 
 		gParent = mxGraph.getDefaultParent();
 		graphComponent = new mxGraphComponent(mxGraph);	
-		getContentPane().add(graphComponent);
+		
 		
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(400, 320);
+		setSize(800, 600);
 		setVisible(true);
 		
 		cells = new ArrayList<>();
@@ -97,7 +128,17 @@ public class Window extends JFrame implements ActionListener {
 		    int returnVal = chooser.showOpenDialog(this);
 	        if (returnVal == JFileChooser.APPROVE_OPTION) {
 	            String file = chooser.getSelectedFile().getAbsolutePath();
+	            //Affichage progressBar 
+	            progressBar.setString("parsing...");
+	            progressBar.setIndeterminate(true);
+	            progressBar.setVisible(true);
+	            this.revalidate();
+	            //TODO : Dans initialize Boy, une fois le parsing terminé, on aimerait bien avoir une progressBar avec pourcentage pour le dessin !
 	            initializeBody(file);
+	            progressBar.setVisible(false);
+	            progressBar.setIndeterminate(false);
+	            getContentPane().add(graphComponent);
+	            this.revalidate();
 	        } else {
 	            System.err.println("Open file cancelled by user.");
 	        }
@@ -108,9 +149,11 @@ public class Window extends JFrame implements ActionListener {
 		    FileNameExtensionFilter filterPNG = new FileNameExtensionFilter("PNG image", "png");
 		    FileNameExtensionFilter filterJPG = new FileNameExtensionFilter("JPG image", "jpeg", "jpg");
 		    FileNameExtensionFilter filterBMP = new FileNameExtensionFilter("BMP image", "bmp");
+		    FileNameExtensionFilter filterTikz = new FileNameExtensionFilter("TIKZ for LATEX", "tex");
 		    chooser.addChoosableFileFilter(filterPNG);
 		    chooser.addChoosableFileFilter(filterJPG);
 		    chooser.addChoosableFileFilter(filterBMP);
+		    chooser.addChoosableFileFilter(filterTikz);
 		    chooser.setAcceptAllFileFilterUsed(false);
 		    int returnVal = chooser.showOpenDialog(this);
 	        if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -130,6 +173,10 @@ public class Window extends JFrame implements ActionListener {
 	            		if(ext.compareToIgnoreCase("bmp")!=0)
 	            			file = new File(file.getAbsolutePath()+".bmp");
 	            		ImageIO.write(image, "BMP", file);
+	            	} else if(chooser.getFileFilter().equals(filterTikz)) {
+	            		if(ext.compareToIgnoreCase("tex")!=0)
+	            			file = new File(file.getAbsolutePath()+".tex");
+	            		TikzExporter.export(file, graph, TikzExporter.WITH_LABEL);
 	            	} else 
 	            		System.err.println("Erreur, choix de filtre non reconnu lors de l'exportation en image.");
 				} catch (IOException e1) {
@@ -153,11 +200,17 @@ public class Window extends JFrame implements ActionListener {
 		}
 		
 		System.out.println("Check graph structure & build it...");
-		Graph graph = parser.getGraph();
+		graph = parser.getGraph();
 		
 		System.out.println("Running coordinates algorithm...");
-		new PositionSerieParallelAlgo(graph);
-		
+		PositionSerieParallelAlgo p = new PositionSerieParallelAlgo(graph);
+		StringBuilder sb = new StringBuilder("nombre d'appels récursifs : ");
+		sb.append(p.getNbRecursiveCalls());
+		sb.append(" (initialize:").append(p.getNbInitialize());
+		sb.append("; computeTree:").append(p.getNbComputeTree());
+		sb.append("; offset:").append(p.getNbOffsets());
+		sb.append("; computeDiad:").append(p.getComputeDiadmonds()).append(')');
+		statusLabel.setText(sb.toString());
 		System.out.println("Building view...");
 		
 		cells.clear();
@@ -178,16 +231,19 @@ public class Window extends JFrame implements ActionListener {
 			draw(cell, child);
 		}
 		
-		node.tag=0;
+		node.printTag=1;
 	}
 
 	private void draw(mxCell parent, Node<?> child) {
 		mxCell cell = null;
-		if(child.tag==1) { //On n'est jamais passé par child
+		if(child.printTag==0) { //On n'est jamais passé par child
 			cell = (mxCell) mxGraph.insertVertex(gParent, null, child.value, child.x*scale, child.y*scale, widthCell, heightCell);
 			cells.add(cell);
 			//System.out.println("add cell "+cell.getValue());
-			child.tag=0;
+			child.printTag=1;
+			for(Node<?> son : child.getChildren()) {
+				draw(cell, son);
+			}
 		} else { //On a déjà fait une cellule pour child
 			for(mxCell c : cells) {
 				if(c.getValue().equals((child.getValue()))) {
@@ -196,8 +252,6 @@ public class Window extends JFrame implements ActionListener {
 				}
 			}
 		}
-			
-
 		boolean drawn = false;
 		for(int i =0 ; i<cell.getEdgeCount(); i++) {
 			mxCell edge = (mxCell) cell.getEdgeAt(i);
@@ -205,11 +259,8 @@ public class Window extends JFrame implements ActionListener {
 				drawn = true;
 			}
 		}
-		if(!drawn) mxGraph.insertEdge(gParent, null, null, parent, cell);
-		
-		for(Node<?> son : child.getChildren()) {
-			draw(cell, son);
-		}
-		
+		if(!drawn) {
+			mxGraph.insertEdge(gParent, null, null, parent, cell);
+		}	
 	}
 }

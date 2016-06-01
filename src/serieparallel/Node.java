@@ -14,12 +14,21 @@ public class Node<T> extends Point.Float {
 	private List<Node<?>> children;
 	//Coordinates x,y inherited
 	public float offset;
-	public int tag = 0;
+	
+	//Détection cycle
 	public int detectionCycle;
-	public boolean visited = false;
-	public int visitedParents = 0;
 	public int color=0;
-	public int initialization=0;
+	
+	//Tags utilisés pour l'algorithme, et l'affichage.
+	public boolean visited = false;
+	public int printTag = 0;
+	public int findDepthTag=0;
+	public int initializationTag=0;
+	public int applyOffsetsTag=0;
+	public int findDiadmondsTag=0;
+	public int exportTag=0;
+
+	public int spaceTag=0;
 
 	
 	/**
